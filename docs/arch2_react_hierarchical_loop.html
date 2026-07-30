@@ -1,0 +1,116 @@
+
+<style>
+.rb { background: var(--color-background-secondary); border: 0.5px solid var(--color-border-tertiary); border-radius: 10px; padding: 10px 14px; }
+.rt { font-size: 11px; font-weight: 500; color: var(--color-text-secondary); letter-spacing: .05em; margin-bottom: 8px; }
+.rbox { border-radius: 8px; padding: 7px 10px; margin-bottom: 6px; font-size: 12px; font-weight: 500; }
+.rp { background: #EEEDFE; color: #3C3489; border: 0.5px solid #AFA9EC; }
+.rg { background: #EAF3DE; color: #27500A; border: 0.5px solid #97C459; }
+.ra { background: #FAEEDA; color: #633806; border: 0.5px solid #EF9F27; }
+.rr { background: #FCEBEB; color: #791F1F; border: 0.5px solid #F09595; }
+.rc { background: #FAECE7; color: #712B13; border: 0.5px solid #F0997B; }
+.rn { background: #F1EFE8; color: #444441; border: 0.5px solid #B4B2A9; }
+.conn { display: flex; align-items: center; justify-content: center; gap: 6px; margin: 4px 0; font-size: 11px; color: var(--color-text-secondary); }
+.conn-line { flex: 1; height: 1px; background: var(--color-border-secondary); }
+.badge2 { font-size: 10px; padding: 2px 7px; border-radius: 8px; font-weight: 500; }
+</style>
+<h2 class="sr-only">Architecture 2: hierarchical ReAct loop — a planner, executor, and critic triad with explicit retry on low-quality outputs.</h2>
+<div style="padding: 1rem 0">
+
+  <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; margin-bottom:4px;">
+    <div class="rb">
+      <div class="rt">User &amp; system entry</div>
+      <div class="rbox rn">AskPG.com / portal</div>
+      <div class="rbox rn">Webhooks &amp; triggers</div>
+    </div>
+    <div class="rb">
+      <div class="rt">Policy &amp; guardrails (inline)</div>
+      <div class="rbox rc">Input sanitizer</div>
+      <div class="rbox rc">Output guardrail check</div>
+    </div>
+  </div>
+
+  <div class="conn"><div class="conn-line"></div><span>intent &amp; task</span><div class="conn-line"></div></div>
+
+  <div class="rb" style="margin-bottom:4px; border-color: #AFA9EC;">
+    <div class="rt">Planner agent — Reason step</div>
+    <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:6px;">
+      <div class="rbox rp" style="font-size:11px;">Goal decomposition</div>
+      <div class="rbox rp" style="font-size:11px;">Subtask sequencing</div>
+      <div class="rbox rp" style="font-size:11px;">Agent assignment</div>
+    </div>
+  </div>
+
+  <div class="conn"><div class="conn-line"></div><span>subtasks</span><div class="conn-line"></div></div>
+
+  <div style="display:grid; grid-template-columns: 2fr 1fr; gap:8px; margin-bottom:4px;">
+    <div class="rb" style="border-color: #97C459;">
+      <div class="rt">Executor agents — Act step</div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px;">
+        <div class="rbox rg" style="font-size:11px;">Knowledge agent</div>
+        <div class="rbox rg" style="font-size:11px;">ITSM agent</div>
+        <div class="rbox rg" style="font-size:11px;">Automation agent</div>
+        <div class="rbox rg" style="font-size:11px;">Research agent</div>
+      </div>
+    </div>
+    <div class="rb">
+      <div class="rt">Tool layer (MCP)</div>
+      <div class="rbox rn" style="font-size:11px;">Tools</div>
+      <div class="rbox rn" style="font-size:11px;">Connectors</div>
+      <div class="rbox rn" style="font-size:11px;">Prompts</div>
+    </div>
+  </div>
+
+  <div class="conn"><div class="conn-line"></div><span>observations</span><div class="conn-line"></div></div>
+
+  <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; margin-bottom:4px;">
+    <div class="rb" style="border-color: #EF9F27;">
+      <div class="rt">Critic agent — Evaluate step</div>
+      <div class="rbox ra" style="font-size:11px;">Quality scorer</div>
+      <div class="rbox ra" style="font-size:11px;">Hallucination check</div>
+      <div class="rbox ra" style="font-size:11px;">Completeness gate</div>
+    </div>
+    <div class="rb">
+      <div class="rt">LLM router + context</div>
+      <div class="rbox rn" style="font-size:11px;">Azure OAI / model select</div>
+      <div class="rbox rn" style="font-size:11px;">Short / working memory</div>
+      <div class="rbox rn" style="font-size:11px;">Long-term embeddings</div>
+    </div>
+  </div>
+
+  <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; margin-bottom:4px;">
+    <div class="rb" style="border-color: #F09595;">
+      <div class="rt">Retry path — if score &lt; threshold</div>
+      <div class="rbox rr" style="font-size:11px;">↻ Replan (back to planner)</div>
+      <div class="rbox rr" style="font-size:11px;">↻ Re-execute (executor)</div>
+      <div class="rbox rr" style="font-size:11px;">Escalate to HITL queue</div>
+    </div>
+    <div class="rb">
+      <div class="rt">Human-in-the-loop (interrupt)</div>
+      <div class="rbox rc" style="font-size:11px;">Approval / review gate</div>
+      <div class="rbox rc" style="font-size:11px;">Resume / reject signal</div>
+      <div class="rbox rc" style="font-size:11px;">Audit trail write</div>
+    </div>
+  </div>
+
+  <div class="conn"><div class="conn-line"></div><span>approved output</span><div class="conn-line"></div></div>
+
+  <div class="rb">
+    <div class="rt">Enterprise data plane</div>
+    <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap:6px;">
+      <div class="rbox rn" style="font-size:11px;">Vector DB / RAG</div>
+      <div class="rbox rn" style="font-size:11px;">Knowledge repos</div>
+      <div class="rbox rn" style="font-size:11px;">SAP / ERP</div>
+      <div class="rbox rn" style="font-size:11px;">ServiceNow</div>
+    </div>
+  </div>
+
+  <div style="margin-top:12px; padding:8px 12px; border-radius:8px; background: var(--color-background-secondary); border: 0.5px solid var(--color-border-tertiary); display:flex; gap:14px; flex-wrap:wrap;">
+    <span style="font-size:11px; color: var(--color-text-secondary);">Legend:</span>
+    <span class="badge2" style="background:#EEEDFE;color:#3C3489;">Planner</span>
+    <span class="badge2" style="background:#EAF3DE;color:#27500A;">Executor</span>
+    <span class="badge2" style="background:#FAEEDA;color:#633806;">Critic</span>
+    <span class="badge2" style="background:#FCEBEB;color:#791F1F;">Retry / escalate</span>
+    <span class="badge2" style="background:#FAECE7;color:#712B13;">Governance / HITL</span>
+    <span class="badge2" style="background:#F1EFE8;color:#444441;">Infrastructure</span>
+  </div>
+</div>

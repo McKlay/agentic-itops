@@ -1,0 +1,5259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ title }}</title>
+  <link rel="icon" type="image/png" href="/static/swiftassist-mark.png">
+  <style>
+    :root {
+      --page: #f5f6fb;
+      --surface: #ffffff;
+      --surface-soft: #f7f8fc;
+      --surface-tint: #f3eefe;
+      --line: #ececf3;
+      --line-strong: #e4ddf8;
+      --text: #1f2533;
+      --muted: #70778c;
+      --purple: #7d48ff;
+      --purple-soft: #efe7ff;
+      --green: #18a957;
+      --green-soft: #ebfff2;
+      --red: #ef6a6a;
+      --red-soft: #fff0f0;
+      --yellow: #f3b741;
+      --yellow-soft: #fff8e8;
+      --blue-soft: #dbeafe;
+      --pink-soft: #ffe1e1;
+      --mint-soft: #d9f8ee;
+      --lavender-soft: #ecdfff;
+      --shadow: 0 16px 40px rgba(25, 30, 58, 0.08);
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      background: var(--page);
+      color: var(--text);
+      font-family: "Segoe UI", "Aptos", sans-serif;
+      overflow: hidden;
+    }
+    body[data-theme="dark"] {
+      --page: #0d1220;
+      --surface: #161d30;
+      --surface-soft: #20283d;
+      --surface-tint: #231c3c;
+      --line: #2c3450;
+      --line-strong: #433760;
+      --text: #edf1ff;
+      --muted: #a4aec8;
+      --purple-soft: #2a2148;
+      --green-soft: #133727;
+      --red-soft: #3d2025;
+      --yellow-soft: #392d17;
+      --blue-soft: #1b2f58;
+      --pink-soft: #41242b;
+      --mint-soft: #173a34;
+      --lavender-soft: #2b2346;
+      --shadow: 0 18px 42px rgba(0, 0, 0, 0.34);
+    }
+    .app-shell {
+      height: 100vh;
+      display: grid;
+      grid-template-columns: 260px minmax(0, 1fr) 320px;
+      overflow: hidden;
+    }
+    .sidebar,
+    .activity {
+      background: rgba(255, 255, 255, 0.96);
+      border-right: 1px solid var(--line);
+    }
+    body[data-theme="dark"] .sidebar,
+    body[data-theme="dark"] .activity {
+      background: #0f1524 !important;
+    }
+    .activity {
+      border-right: none;
+      border-left: 1px solid var(--line);
+      height: 100vh;
+      min-height: 0;
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr) auto;
+      overflow: hidden;
+    }
+    .sidebar {
+      height: 100vh;
+      min-height: 0;
+      display: grid;
+      grid-template-rows: auto auto minmax(0, 1fr) auto auto;
+      padding: 16px 12px 12px;
+      gap: 16px;
+      overflow: hidden;
+    }
+    .brand {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      padding: 4px 6px;
+    }
+    .brand-badge {
+      width: 28px;
+      height: 28px;
+      border-radius: 10px;
+      background: center / cover no-repeat url("/static/swiftassist-mark.png");
+      box-shadow: 0 8px 18px rgba(11, 18, 32, 0.18);
+    }
+    .brand-title {
+      font-size: 22px;
+      font-weight: 700;
+      line-height: 1;
+    }
+    .brand-subtitle {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+    body[data-theme="dark"] .brand-title {
+      color: #f5f7ff;
+    }
+    body[data-theme="dark"] .brand-subtitle {
+      color: #9ea8c3;
+    }
+    .nav-group,
+    .session-block,
+    .sidebar-footer {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+    }
+    body[data-theme="dark"] .nav-group,
+    body[data-theme="dark"] .session-block,
+    body[data-theme="dark"] .sidebar-footer,
+    body[data-theme="dark"] .utility-menu,
+    body[data-theme="dark"] .theme-switcher,
+    body[data-theme="dark"] .role-indicator {
+      background: #161d30;
+      border-color: #2b3550;
+    }
+    .nav-group { padding: 8px; }
+    .nav-item,
+    .footer-link,
+    .session-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+      border: none;
+      background: transparent;
+      padding: 10px 12px;
+      border-radius: 12px;
+      color: var(--text);
+      text-align: left;
+      cursor: pointer;
+      font-size: 13px;
+    }
+    .sidebar-footer .footer-link {
+      padding: 8px 10px;
+      gap: 8px;
+      font-size: 12px;
+    }
+    .nav-item.active {
+      background: #f5f0ff;
+      color: #6e39ef;
+      font-weight: 600;
+    }
+    .icon {
+      width: 16px;
+      height: 16px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: currentColor;
+      flex: 0 0 16px;
+    }
+    .session-block {
+      padding: 12px 10px 10px;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+      overflow: hidden;
+    }
+    .session-header,
+    .sidebar-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 4px 10px;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .session-list {
+      display: grid;
+      gap: 4px;
+      overflow: auto;
+      min-height: 0;
+      padding-right: 2px;
+    }
+    .session-item {
+      padding: 10px;
+      align-items: flex-start;
+    }
+    .session-item.active { background: var(--surface-soft); }
+    .session-main {
+      display: grid;
+      gap: 2px;
+      min-width: 0;
+      flex: 1;
+    }
+    .session-actions {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      margin-left: auto;
+      opacity: 0;
+      transition: opacity 0.16s ease;
+    }
+    .session-item:hover .session-actions,
+    .session-item.active .session-actions {
+      opacity: 1;
+    }
+    .session-action {
+      width: 24px;
+      height: 24px;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      background: var(--surface);
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 11px;
+      flex: 0 0 24px;
+    }
+    .session-title {
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 2px;
+      display: block;
+      overflow-wrap: anywhere;
+    }
+    .session-meta {
+      font-size: 11px;
+      color: var(--muted);
+      display: block;
+    }
+    .add-button {
+      width: 22px;
+      height: 22px;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      background: var(--surface-soft);
+      color: var(--muted);
+      cursor: pointer;
+    }
+    .sidebar-footer {
+      padding: 6px;
+      display: grid;
+      gap: 2px;
+      min-width: 0;
+    }
+    .sidebar-footer-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 6px;
+      align-items: center;
+    }
+    .sidebar-utilities {
+      display: grid;
+      gap: 8px;
+      padding: 0 8px 6px;
+    }
+    .sidebar-profile {
+      width: 100%;
+    }
+    .utility-menu {
+      display: grid;
+      gap: 6px;
+      margin-top: 2px;
+      padding: 10px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+    }
+    .utility-menu[hidden] {
+      display: none;
+    }
+    .role-option {
+      border: 1px solid transparent;
+      background: transparent;
+      color: var(--text);
+      border-radius: 12px;
+      padding: 9px 10px;
+      text-align: left;
+      font-size: 13px;
+      cursor: pointer;
+    }
+    .role-option.active {
+      background: var(--surface-soft);
+      border-color: var(--line-strong);
+      color: var(--purple);
+      font-weight: 700;
+    }
+    .support-copy {
+      margin: 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+    .footer-chip {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-width: 0;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--surface-soft);
+      color: var(--text);
+      padding: 8px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: var(--shadow);
+    }
+    .footer-chip.role-chip {
+      padding-left: 10px;
+      padding-right: 10px;
+      white-space: nowrap;
+    }
+    .role-indicator {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      width: fit-content;
+      padding: 7px 10px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--surface);
+      box-shadow: var(--shadow);
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .settings-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(9, 12, 20, 0.56);
+      display: grid;
+      place-items: center;
+      z-index: 50;
+      padding: 28px;
+    }
+    .settings-overlay[hidden] {
+      display: none;
+    }
+    .settings-panel {
+      width: min(1080px, 100%);
+      max-height: calc(100vh - 56px);
+      overflow: auto;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      box-shadow: 0 24px 60px rgba(13, 17, 34, 0.24);
+    }
+    .settings-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--line);
+      position: sticky;
+      top: 0;
+      background: var(--surface);
+      z-index: 1;
+    }
+    .settings-title {
+      margin: 0;
+      font-size: 20px;
+      font-weight: 800;
+    }
+    .settings-body {
+      display: grid;
+      gap: 18px;
+      padding: 22px 24px 24px;
+    }
+    .settings-tab-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding-bottom: 4px;
+    }
+    .settings-tab-button {
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--surface);
+      color: var(--text);
+      padding: 10px 14px;
+      font: inherit;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .settings-tab-button.active {
+      background: linear-gradient(135deg, #7c3aed, #a855f7);
+      border-color: transparent;
+      color: #fff;
+      box-shadow: 0 12px 26px rgba(124, 58, 237, 0.28);
+    }
+    .settings-tab-panel {
+      display: grid;
+      gap: 18px;
+    }
+    .settings-tab-panel[hidden] {
+      display: none !important;
+    }
+    .settings-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+    }
+    .settings-grid.two-column {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .settings-card {
+      background: var(--surface-soft);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 18px;
+      display: grid;
+      gap: 14px;
+    }
+    .settings-card h3,
+    .persona-block h3 {
+      margin: 0;
+      font-size: 15px;
+      font-weight: 800;
+    }
+    .settings-card p,
+    .persona-block p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+    .settings-field {
+      display: grid;
+      gap: 6px;
+    }
+    .settings-field label {
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .settings-field input,
+    .settings-field textarea,
+    .settings-field select {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: var(--surface);
+      color: var(--text);
+      font: inherit;
+      padding: 11px 12px;
+      outline: none;
+    }
+    .settings-field textarea {
+      min-height: 120px;
+      resize: vertical;
+    }
+    .settings-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+    }
+    .persona-grid {
+      display: grid;
+      gap: 14px;
+    }
+    .persona-block {
+      background: var(--surface-soft);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 18px;
+      display: grid;
+      gap: 10px;
+    }
+    .connector-test-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .connector-test-status {
+      font-size: 12px;
+      line-height: 1.5;
+      color: var(--muted);
+      min-height: 18px;
+    }
+    .connector-test-status.success {
+      color: #10b981;
+    }
+    .connector-test-status.warning {
+      color: #d97706;
+    }
+    .connector-test-status.error {
+      color: #ef4444;
+    }
+    .connector-test-status.pending {
+      color: #6366f1;
+    }
+    .sla-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+    .sla-card {
+      background: var(--surface-soft);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 18px;
+      display: grid;
+      gap: 12px;
+    }
+    .sla-card h3 {
+      margin: 0;
+      font-size: 15px;
+      font-weight: 800;
+    }
+    .settings-actions {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding-top: 6px;
+    }
+    .settings-status {
+      color: var(--muted);
+      font-size: 12px;
+      min-height: 18px;
+    }
+    .icon-button {
+      width: 34px;
+      height: 34px;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      background: var(--surface-soft);
+      color: var(--text);
+      cursor: pointer;
+      font-size: 15px;
+    }
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .profile-shell {
+      position: relative;
+    }
+    .profile-trigger {
+      border: 1px solid var(--line);
+      background: var(--surface);
+      color: var(--text);
+      border-radius: 999px;
+      padding: 4px;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      box-shadow: var(--shadow);
+    }
+    .sidebar-profile .profile-trigger {
+      width: 100%;
+      justify-content: flex-start;
+    }
+    .profile-trigger-label {
+      padding-right: 8px;
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 600;
+    }
+    .profile-avatar {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: linear-gradient(180deg, #4c8edc, #3165b7);
+      color: #fff;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 800;
+      flex: 0 0 30px;
+    }
+    .profile-menu {
+      position: absolute;
+      top: calc(100% + 10px);
+      right: 0;
+      width: 300px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      box-shadow: 0 24px 60px rgba(10, 14, 30, 0.22);
+      padding: 12px;
+      z-index: 40;
+    }
+    .sidebar-profile .profile-menu {
+      top: auto;
+      bottom: calc(100% + 10px);
+      left: 0;
+      right: auto;
+    }
+    .profile-menu[hidden] {
+      display: none;
+    }
+    .profile-menu-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 10px 14px;
+      border-bottom: 1px solid var(--line);
+      margin-bottom: 8px;
+    }
+    .profile-name {
+      font-size: 15px;
+      font-weight: 800;
+    }
+    .profile-meta {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+    .profile-menu-button {
+      width: 100%;
+      border: none;
+      background: transparent;
+      color: var(--text);
+      border-radius: 14px;
+      padding: 12px 10px;
+      text-align: left;
+      font-size: 14px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .profile-menu-button:hover {
+      background: var(--surface-soft);
+    }
+    .profile-menu-divider {
+      height: 1px;
+      background: var(--line);
+      margin: 8px 0;
+    }
+    .profile-detail-card {
+      background: var(--surface-soft);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 18px;
+      display: grid;
+      gap: 14px;
+    }
+    .theme-switcher {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 4px;
+      padding: 3px;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      background: var(--surface);
+      box-shadow: var(--shadow);
+      width: 100%;
+    }
+    .theme-chip {
+      border: none;
+      background: transparent;
+      border-radius: 9px;
+      padding: 6px 10px;
+      font-size: 11px;
+      color: var(--muted);
+      cursor: pointer;
+      white-space: nowrap;
+      width: 100%;
+      text-align: center;
+    }
+    .theme-chip.active {
+      background: var(--surface-soft);
+      color: var(--text);
+      font-weight: 600;
+    }
+    .powered-by {
+      font-size: 10px;
+      color: #9aa1b3;
+      width: 100%;
+      padding-left: 0;
+      text-align: center;
+      justify-self: center;
+    }
+    .workspace {
+      height: 100vh;
+      min-width: 0;
+      min-height: 0;
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr);
+      background:
+        radial-gradient(circle at 50% 0%, rgba(125, 72, 255, 0.08), transparent 32rem),
+        linear-gradient(180deg, #ffffff 0%, #fbfbfe 100%);
+      overflow: hidden;
+    }
+    body[data-theme="dark"] .workspace {
+      background:
+        radial-gradient(circle at 50% 0%, rgba(125, 72, 255, 0.16), transparent 28rem),
+        linear-gradient(180deg, #131a2c 0%, #0f1524 100%);
+    }
+    .workspace-header {
+      height: 72px;
+      flex: 0 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 28px;
+      border-bottom: 1px solid var(--line);
+    }
+    body[data-theme="dark"] .workspace-header {
+      background: rgba(15, 21, 36, 0.88);
+    }
+    .workspace-title {
+      font-size: 18px;
+      font-weight: 700;
+    }
+    .health {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--green);
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      cursor: default;
+    }
+    .health-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 0 4px rgba(24, 169, 87, 0.12);
+    }
+    .health.warning {
+      color: var(--yellow);
+    }
+    .health.warning .health-dot {
+      background: var(--yellow);
+      box-shadow: 0 0 0 4px rgba(243, 183, 65, 0.16);
+    }
+    .health.failure {
+      color: var(--red);
+    }
+    .health.failure .health-dot {
+      background: var(--red);
+      box-shadow: 0 0 0 4px rgba(239, 106, 106, 0.16);
+    }
+    .health-tooltip {
+      position: absolute;
+      top: calc(100% + 10px);
+      right: 0;
+      width: min(360px, 48vw);
+      padding: 12px 14px;
+      border-radius: 14px;
+      border: 1px solid var(--line);
+      background: var(--surface);
+      color: var(--text);
+      box-shadow: var(--shadow);
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(-4px);
+      transition: opacity 0.16s ease, transform 0.16s ease;
+      z-index: 20;
+      text-transform: none;
+      letter-spacing: normal;
+    }
+    .health:hover .health-tooltip,
+    .health:focus-within .health-tooltip {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .health-tooltip-title {
+      font-size: 12px;
+      font-weight: 800;
+      margin-bottom: 8px;
+    }
+    .health-tooltip-list {
+      display: grid;
+      gap: 6px;
+      margin: 0;
+      padding-left: 16px;
+      font-size: 12px;
+      line-height: 1.5;
+    }
+    .workspace-body {
+      min-height: 0;
+      display: grid;
+      grid-template-rows: minmax(0, 1fr) auto;
+      overflow: hidden;
+    }
+    .session-list,
+    .conversation,
+    .feed,
+    .settings-panel {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+    .session-list::-webkit-scrollbar,
+    .conversation::-webkit-scrollbar,
+    .feed::-webkit-scrollbar,
+    .settings-panel::-webkit-scrollbar {
+      display: none;
+      width: 0;
+      height: 0;
+    }
+    .conversation {
+      min-height: 0;
+      overflow: auto;
+      padding: 20px 18px 24px;
+    }
+    .conversation-inner {
+      width: 100%;
+      max-width: none;
+      margin: 0;
+    }
+    .hero {
+      min-height: calc(100vh - 220px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+    .hero-inner {
+      max-width: 560px;
+    }
+    .orb {
+      width: 52px;
+      height: 52px;
+      margin: 0 auto 18px;
+      border-radius: 16px;
+      background: center / cover no-repeat url("/static/swiftassist-mark.png");
+      box-shadow: 0 12px 28px rgba(8, 18, 40, 0.22);
+    }
+    .hero h1 {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 700;
+    }
+    .hero p {
+      margin: 6px 0 22px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+    .quick-actions {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+    .action-card {
+      border: 1px solid transparent;
+      border-radius: 16px;
+      padding: 14px 16px;
+      text-align: left;
+      font-size: 13px;
+      line-height: 1.35;
+      cursor: pointer;
+      color: var(--text);
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      box-shadow: 0 8px 18px rgba(24, 28, 48, 0.05);
+    }
+    .action-card.blue { background: var(--blue-soft); }
+    .action-card.pink { background: var(--pink-soft); }
+    .action-card.lavender { background: var(--lavender-soft); }
+    .action-card.mint { background: var(--mint-soft); }
+    .message {
+      display: flex;
+      margin-bottom: 18px;
+    }
+    .message.user {
+      justify-content: flex-end;
+    }
+    .message.user .message-stack {
+      align-items: flex-end;
+    }
+    .message-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      max-width: 100%;
+      min-width: 0;
+    }
+    .bubble {
+      max-width: 100%;
+      border-radius: 18px;
+      padding: 14px 16px;
+      box-shadow: 0 12px 24px rgba(31, 37, 51, 0.06);
+      min-width: 0;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }
+    .message.user .bubble {
+      background: #dfeafd;
+      border-top-right-radius: 8px;
+      font-weight: 600;
+      font-size: 13px;
+    }
+    .message.assistant .bubble {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-top-left-radius: 8px;
+    }
+    .bubble-meta {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 6px;
+      color: var(--muted);
+      font-size: 11px;
+    }
+    .message-head {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--muted);
+      font-size: 11px;
+    }
+    .avatar {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex: 0 0 26px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .avatar.user {
+      background: #171922;
+      color: #ffffff;
+      border: 1px solid rgba(18, 24, 38, 0.18);
+      box-shadow: 0 4px 10px rgba(16, 22, 34, 0.14);
+    }
+    body[data-theme="dark"] .avatar.user {
+      background: #0b101c;
+      color: #ffffff;
+      border: 1px solid #5e6b8c;
+      box-shadow: 0 0 0 1px rgba(151, 164, 201, 0.16), 0 6px 14px rgba(0, 0, 0, 0.32);
+    }
+    .avatar.agent {
+      background: center / cover no-repeat url("/static/swiftassist-mark.png");
+      box-shadow: 0 8px 16px rgba(13, 24, 45, 0.22);
+    }
+    .agent-name {
+      font-size: 13px;
+      font-style: italic;
+      color: #52586d;
+      font-weight: 600;
+    }
+    .loading-line {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: var(--text);
+    }
+    .spinner {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      border: 2px solid rgba(125, 72, 255, 0.18);
+      border-top-color: var(--purple);
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    .cancel {
+      margin-top: 10px;
+      border: 1px solid #ffd4d4;
+      background: #fff5f5;
+      color: #df5c5c;
+      border-radius: 999px;
+      padding: 6px 10px;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .artifact {
+      background: var(--surface);
+      border: 1px solid var(--line-strong);
+      border-radius: 20px;
+      box-shadow: 0 18px 36px rgba(125, 72, 255, 0.08);
+      overflow: hidden;
+      min-width: 0;
+    }
+    .artifact-header {
+      padding: 20px 22px 12px;
+      border-bottom: 1px solid var(--line-strong);
+    }
+    .artifact-title {
+      margin: 0;
+      color: #12814b;
+      font-size: 18px;
+      font-weight: 800;
+    }
+    .artifact-subtitle {
+      margin-top: 8px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .artifact-section {
+      padding: 18px 22px;
+      border-bottom: 1px solid #f0ecfb;
+      min-width: 0;
+    }
+    .artifact-section:last-child { border-bottom: none; }
+    .artifact-section h3 {
+      margin: 0 0 10px;
+      color: #6d27d6;
+      font-size: 15px;
+    }
+    .artifact-section p,
+    .artifact-section li {
+      margin: 0;
+      color: #31374a;
+      font-size: 13px;
+      line-height: 1.6;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }
+    .artifact-section ul {
+      margin: 0;
+      padding-left: 18px;
+      display: grid;
+      gap: 8px;
+    }
+    .list-card {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 16px;
+      box-shadow: 0 12px 28px rgba(31, 37, 51, 0.05);
+      min-width: 0;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }
+    .list-card + .list-card { margin-top: 12px; }
+    .list-title {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 8px;
+      font-weight: 700;
+      font-size: 14px;
+      min-width: 0;
+      flex-wrap: wrap;
+    }
+    .list-subtitle {
+      color: var(--muted);
+      font-size: 12px;
+      margin-bottom: 10px;
+    }
+    .knowledge-article {
+      background: transparent;
+      border: none;
+      box-shadow: none;
+      padding: 0;
+      min-width: 0;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }
+    .knowledge-article h3 {
+      margin: 20px 0 10px;
+      font-size: 16px;
+      color: #1f2533;
+    }
+    .knowledge-article h4 {
+      margin: 16px 0 8px;
+      font-size: 14px;
+      color: #2e4fc7;
+    }
+    .knowledge-article ol,
+    .knowledge-article ul {
+      margin: 0 0 0 18px;
+      padding: 0;
+      color: #343a4c;
+      line-height: 1.55;
+    }
+    .knowledge-article li {
+      margin-bottom: 8px;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 10px;
+    }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: var(--surface-soft);
+      border: 1px solid var(--line);
+      font-size: 11px;
+      color: var(--muted);
+    }
+    .small-button {
+      border: 1px solid var(--line-strong);
+      background: #f7f2ff;
+      color: #6930e6;
+      border-radius: 999px;
+      padding: 7px 10px;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .small-button.secondary {
+      background: #f8fafc;
+      color: var(--text);
+      border-color: var(--line);
+    }
+    .composer {
+      padding: 0 28px 18px;
+    }
+    .composer-inner {
+      max-width: 760px;
+      margin: 0 auto;
+      background: rgba(255,255,255,0.96);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      box-shadow: 0 12px 28px rgba(31, 37, 51, 0.08);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+    }
+    .composer-tool {
+      width: 30px;
+      height: 30px;
+      border-radius: 10px;
+      border: 1px solid var(--line);
+      background: #f8f9fc;
+      color: var(--muted);
+      cursor: pointer;
+      flex: 0 0 30px;
+    }
+    .composer input {
+      border: none;
+      background: transparent;
+      flex: 1;
+      font-size: 13px;
+      outline: none;
+      color: var(--text);
+    }
+    .send-button {
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      border: none;
+      background: #eef1f8;
+      color: var(--muted);
+      cursor: pointer;
+      font-weight: 700;
+    }
+    body[data-theme="dark"] .message.user .bubble {
+      background: #263b6c;
+      color: #f6f8ff;
+    }
+    body[data-theme="dark"] .composer-inner {
+      background: rgba(22, 29, 48, 0.96);
+    }
+    body[data-theme="dark"] .composer-tool,
+    body[data-theme="dark"] .send-button {
+      background: #212a40;
+      color: var(--muted);
+    }
+    body[data-theme="dark"] .nav-item.active {
+      background: linear-gradient(180deg, #31214f 0%, #231b3e 100%);
+      color: #ddd2ff;
+    }
+    body[data-theme="dark"] .nav-item,
+    body[data-theme="dark"] .footer-link,
+    body[data-theme="dark"] .session-item,
+    body[data-theme="dark"] .page-title,
+    body[data-theme="dark"] .chart-title,
+    body[data-theme="dark"] .problem-title,
+    body[data-theme="dark"] .activity-title,
+    body[data-theme="dark"] .workspace-title,
+    body[data-theme="dark"] .metric-tile strong {
+      color: #f4f7ff;
+    }
+    body[data-theme="dark"] .session-item.active {
+      background: #232d46;
+    }
+    body[data-theme="dark"] .theme-chip {
+      color: #b8c0d8;
+    }
+    body[data-theme="dark"] .theme-chip.active {
+      background: #2a3654;
+      color: #ffffff;
+    }
+    body[data-theme="dark"] .session-action {
+      background: #20283d;
+      border-color: #33405e;
+      color: #b8c0d8;
+    }
+    body[data-theme="dark"] .small-button {
+      background: #281f48;
+      color: #d6c9ff;
+    }
+    body[data-theme="dark"] .small-button.secondary {
+      background: #1c2436;
+      color: var(--text);
+    }
+    body[data-theme="dark"] .settings-panel,
+    body[data-theme="dark"] .settings-header,
+    body[data-theme="dark"] .settings-card,
+    body[data-theme="dark"] .persona-block,
+    body[data-theme="dark"] .settings-field input,
+    body[data-theme="dark"] .settings-field textarea,
+    body[data-theme="dark"] .settings-field select,
+    body[data-theme="dark"] .icon-button,
+    body[data-theme="dark"] .profile-trigger,
+    body[data-theme="dark"] .profile-menu,
+    body[data-theme="dark"] .profile-detail-card {
+      background: #161d30;
+      border-color: #2c3550;
+      color: var(--text);
+    }
+    body[data-theme="dark"] .settings-card,
+    body[data-theme="dark"] .persona-block {
+      background: #1b2337;
+    }
+    body[data-theme="dark"] .message.assistant .bubble,
+    body[data-theme="dark"] .artifact,
+    body[data-theme="dark"] .list-card {
+      background: #1a2236;
+      border-color: #2d3855;
+      color: #eef3ff;
+    }
+    body[data-theme="dark"] .artifact-header,
+    body[data-theme="dark"] .artifact-section {
+      border-color: #2d3855;
+    }
+    body[data-theme="dark"] .artifact-title,
+    body[data-theme="dark"] .artifact-section h3,
+    body[data-theme="dark"] .knowledge-article h3,
+    body[data-theme="dark"] .knowledge-article h4,
+    body[data-theme="dark"] .list-title,
+    body[data-theme="dark"] .message.assistant strong {
+      color: #f5f8ff;
+    }
+    body[data-theme="dark"] .artifact-subtitle,
+    body[data-theme="dark"] .list-subtitle,
+    body[data-theme="dark"] .agent-name,
+    body[data-theme="dark"] .bubble-meta {
+      color: #b8c3dd;
+    }
+    body[data-theme="dark"] .artifact-section p,
+    body[data-theme="dark"] .artifact-section li,
+    body[data-theme="dark"] .artifact-section span,
+    body[data-theme="dark"] .knowledge-article,
+    body[data-theme="dark"] .knowledge-article p,
+    body[data-theme="dark"] .knowledge-article li,
+    body[data-theme="dark"] .knowledge-article div,
+    body[data-theme="dark"] .message.assistant .bubble p,
+    body[data-theme="dark"] .message.assistant .bubble li,
+    body[data-theme="dark"] .message.assistant .bubble span {
+      color: #e6ecfb;
+    }
+    body[data-theme="dark"] .knowledge-article a,
+    body[data-theme="dark"] .artifact-section a,
+    body[data-theme="dark"] .message.assistant .bubble a {
+      color: #8fb9ff;
+    }
+    .experience {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding-top: 10px;
+      color: #9aa1b3;
+      font-size: 11px;
+    }
+    .experience-icons {
+      display: flex;
+      gap: 8px;
+    }
+    .experience-icons button {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      border: 1px solid var(--line);
+      background: var(--surface);
+      color: #9aa1b3;
+      font-size: 10px;
+      cursor: pointer;
+      padding: 0;
+    }
+    .experience-icons button.active {
+      background: var(--surface-tint);
+      border-color: var(--line-strong);
+      color: var(--purple);
+      transform: translateY(-1px);
+    }
+    .experience-feedback {
+      text-align: center;
+      color: var(--muted);
+      font-size: 11px;
+      padding-top: 6px;
+      min-height: 18px;
+    }
+    .response-rating-note {
+      margin-top: 12px;
+      color: var(--muted);
+      font-size: 11px;
+      font-style: italic;
+    }
+    .activity-header {
+      padding: 18px 18px 10px;
+      border-bottom: 1px solid var(--line);
+    }
+    .activity-title {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+    .legend {
+      display: flex;
+      gap: 10px;
+      color: var(--muted);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      font-weight: 700;
+    }
+    .legend span::before {
+      content: "";
+      display: inline-block;
+      width: 5px;
+      height: 5px;
+      margin-right: 6px;
+      border-radius: 50%;
+      vertical-align: middle;
+    }
+    .legend .inc::before { background: #d54f4f; }
+    .legend .cpu::before { background: #f0ad35; }
+    .legend .sla::before { background: #7d48ff; }
+    .feed {
+      min-height: 0;
+      overflow: auto;
+      padding: 14px;
+      display: grid;
+      gap: 10px;
+    }
+    .feed-card {
+      border-radius: 14px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      background: var(--surface);
+      box-shadow: 0 12px 24px rgba(31, 37, 51, 0.04);
+    }
+    .feed-card.monitoring { background: var(--yellow-soft); }
+    .feed-card.problem { background: var(--surface); }
+    .feed-card.incident { background: var(--red-soft); }
+    .feed-card.orchestration { background: var(--purple-soft); }
+    body[data-theme="dark"] .feed-card.monitoring {
+      background: #3a3018;
+      border-color: #6d5620;
+    }
+    body[data-theme="dark"] .feed-card.problem {
+      background: #161d30;
+      border-color: #2c3550;
+    }
+    body[data-theme="dark"] .feed-card.incident {
+      background: #3f2328;
+      border-color: #6c3941;
+    }
+    body[data-theme="dark"] .feed-card.orchestration {
+      background: #272042;
+      border-color: #473d70;
+    }
+    .feed-meta {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 8px;
+      font-size: 10px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      font-weight: 700;
+    }
+    .feed-text {
+      font-size: 12px;
+      line-height: 1.45;
+      color: #363d51;
+    }
+    body[data-theme="dark"] .feed-text {
+      color: var(--text);
+    }
+    .feed-arrow {
+      color: #b0b5c4;
+      font-size: 13px;
+      margin-left: 8px;
+    }
+    .metric-strip {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+      padding: 10px 14px 12px;
+      border-top: 1px solid var(--line);
+    }
+    .metric-tile {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: var(--surface-soft);
+      padding: 8px 10px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+    body[data-theme="dark"] .metric-tile {
+      background: #20283d;
+    }
+    body[data-theme="dark"] .metric-tile span,
+    body[data-theme="dark"] .page-subtitle,
+    body[data-theme="dark"] .page-toolbar,
+    body[data-theme="dark"] .legend,
+    body[data-theme="dark"] .legend-row,
+    body[data-theme="dark"] .feed-meta,
+    body[data-theme="dark"] .powered-by,
+    body[data-theme="dark"] .support-copy,
+    body[data-theme="dark"] .session-meta,
+    body[data-theme="dark"] .sidebar-row {
+      color: #a7b0c9;
+    }
+    .metric-tile span {
+      display: block;
+      color: var(--muted);
+      font-size: 9px;
+      line-height: 1.25;
+      text-align: center;
+    }
+    .metric-tile strong {
+      display: block;
+      margin-top: 3px;
+      font-size: 14px;
+      line-height: 1.1;
+      text-align: center;
+    }
+    .page-shell {
+      width: 100%;
+      max-width: none;
+      margin: 0;
+      display: grid;
+      gap: 18px;
+    }
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 20px;
+    }
+    .page-title {
+      font-size: 24px;
+      font-weight: 800;
+      margin: 0 0 4px;
+    }
+    .page-subtitle {
+      color: var(--muted);
+      font-size: 14px;
+    }
+    .page-toolbar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .live-pill,
+    .tab-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 14px;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      background: var(--surface);
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+    }
+    .tab-chip:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    .live-pill::before {
+      content: "";
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #42d695;
+    }
+    .live-pill.warning::before {
+      background: #f3b741;
+    }
+    .live-pill.failure::before {
+      background: #ef6a6a;
+    }
+    .live-pill.failure {
+      color: #c94343;
+      border-color: rgba(239, 106, 106, 0.32);
+      background: var(--red-soft);
+    }
+    .live-pill.warning {
+      color: #b67a10;
+      border-color: rgba(243, 183, 65, 0.35);
+      background: var(--yellow-soft);
+    }
+    body[data-theme="dark"] .live-pill.failure {
+      color: #ff8c8c;
+      border-color: rgba(239, 106, 106, 0.35);
+      background: #3d2025;
+    }
+    body[data-theme="dark"] .live-pill.warning {
+      color: #ffd36f;
+      border-color: rgba(243, 183, 65, 0.35);
+      background: #392d17;
+    }
+    .tab-chip.active {
+      background: linear-gradient(180deg, #a53cff, #7d21f3);
+      color: #fff;
+      border-color: transparent;
+      box-shadow: 0 10px 18px rgba(125, 33, 243, 0.2);
+    }
+    .notice-banner {
+      border: 1px solid #f3dc89;
+      background: #fff8de;
+      color: #b87018;
+      border-radius: 14px;
+      padding: 12px 16px;
+      font-size: 14px;
+      font-weight: 600;
+    }
+    .stats-grid,
+    .chart-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+    }
+    .chart-card,
+    .panel-card,
+    .problem-card,
+    .table-card {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      box-shadow: var(--shadow);
+    }
+    body[data-theme="dark"] .chart-card,
+    body[data-theme="dark"] .panel-card,
+    body[data-theme="dark"] .problem-card,
+    body[data-theme="dark"] .table-card,
+    body[data-theme="dark"] .node-card,
+    body[data-theme="dark"] .kpi-card,
+    body[data-theme="dark"] .timeline-stage {
+      background: #161d30;
+      border-color: #2c3550;
+      box-shadow: 0 16px 34px rgba(0, 0, 0, 0.28);
+    }
+    body[data-theme="dark"] .tab-chip,
+    body[data-theme="dark"] .live-pill {
+      color: #f4f7ff;
+      background: #161d30;
+      border-color: #33405e;
+    }
+    body[data-theme="dark"] .notice-banner {
+      background: #3a3018;
+      border-color: #6d5620;
+      color: #f7d171;
+    }
+    .chart-card,
+    .panel-card {
+      padding: 18px 18px 16px;
+    }
+    .chart-card {
+      min-height: 248px;
+      max-height: 248px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .chart-title {
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+    .bar-chart {
+      display: flex;
+      align-items: flex-end;
+      gap: 12px;
+      height: 176px;
+      margin-top: auto;
+      overflow: hidden;
+    }
+    .bar {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      min-width: 0;
+    }
+    .bar-visual {
+      width: 100%;
+      border-radius: 8px 8px 0 0;
+      max-height: 156px;
+    }
+    .donut {
+      width: 138px;
+      height: 138px;
+      margin: auto auto 14px;
+      border-radius: 50%;
+      position: relative;
+      background: conic-gradient(#14c38e 0 65%, #3a74f5 65% 88%, #4a5568 88% 92%, #ebedf3 92% 100%);
+    }
+    .donut::after {
+      content: "";
+      position: absolute;
+      inset: 18px;
+      background: var(--surface);
+      border-radius: 50%;
+    }
+    .pie {
+      width: 140px;
+      height: 140px;
+      margin: 0 auto 18px;
+      border-radius: 50%;
+      background: conic-gradient(#44506a 0 96%, #c9ceda 96% 100%);
+    }
+    .legend-row {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      font-size: 11px;
+      color: var(--muted);
+      flex-wrap: wrap;
+      margin-top: auto;
+    }
+    .legend-row span {
+      display: inline-flex;
+      align-items: center;
+      white-space: nowrap;
+    }
+    .legend-row span::before {
+      content: "";
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      display: inline-block;
+      margin-right: 6px;
+    }
+    .legend-row .closed::before { background: #4a5568; }
+    .legend-row .open::before { background: #3a74f5; }
+    .legend-row .resolved::before { background: #14c38e; }
+    .legend-row .ai::before { background: #b241ff; }
+    .legend-row .human::before { background: #44506a; }
+    .legend-row .response::before { background: #3a74f5; }
+    .legend-row .resolution::before { background: #14c38e; }
+    .sla-compare {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      align-items: end;
+      min-height: 136px;
+      margin-bottom: 8px;
+      margin-top: auto;
+    }
+    .sla-metric {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      min-width: 0;
+    }
+    .sla-track {
+      width: 50px;
+      height: 100px;
+      border-radius: 16px;
+      background: rgba(90, 104, 141, 0.16);
+      border: 1px solid rgba(114, 130, 167, 0.2);
+      padding: 8px;
+      display: flex;
+      align-items: flex-end;
+      overflow: hidden;
+    }
+    .sla-fill {
+      width: 100%;
+      min-height: 12px;
+      border-radius: 12px;
+      transition: height 0.25s ease;
+    }
+    .sla-fill.good {
+      background: linear-gradient(180deg, #40d39a 0%, #1ca36d 100%);
+    }
+    .sla-fill.warning {
+      background: linear-gradient(180deg, #f4d35e 0%, #d1a83c 100%);
+    }
+    .sla-fill.risk {
+      background: linear-gradient(180deg, #ff7a7a 0%, #d54545 100%);
+    }
+    .sla-label {
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .sla-value {
+      font-size: 10px;
+      color: var(--muted);
+      text-align: center;
+      line-height: 1.2;
+    }
+    .chart-note {
+      font-size: 10px;
+      color: var(--muted);
+      text-align: center;
+      line-height: 1.25;
+    }
+    .sla-compare {
+      align-items: start;
+      margin-bottom: 10px;
+    }
+    .sla-metric {
+      justify-content: flex-start;
+      gap: 8px;
+    }
+    .sla-label {
+      font-size: 12px;
+      line-height: 1.15;
+      text-align: center;
+    }
+    .sla-value {
+      display: grid;
+      gap: 2px;
+      justify-items: center;
+      font-size: 11px;
+      line-height: 1.25;
+    }
+    .sla-legend {
+      justify-content: center;
+      align-items: center;
+      gap: 14px;
+      margin-top: 2px;
+      font-size: 11px;
+      line-height: 1.2;
+    }
+    .sla-legend span {
+      justify-content: center;
+    }
+    .sla-note {
+      max-width: 220px;
+      margin: 6px auto 0;
+      font-size: 10px;
+      line-height: 1.3;
+      text-align: center;
+    }
+    .search-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 14px;
+      padding: 18px 22px;
+    }
+    .search-input {
+      min-width: 320px;
+      flex: 1;
+      border: 1px solid var(--line);
+      background: var(--surface-soft);
+      border-radius: 14px;
+      padding: 12px 14px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+    body[data-theme="dark"] .search-input {
+      background: #232c43;
+      border-color: #33405e;
+      color: #eef2ff;
+    }
+    body[data-theme="dark"] .search-input::placeholder {
+      color: #9ea7c2;
+    }
+    input.search-input {
+      outline: none;
+      color: var(--text);
+    }
+    .filter-row {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+    .simple-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+      table-layout: fixed;
+    }
+    .simple-table th,
+    .simple-table td {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      vertical-align: middle;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }
+    .simple-table th {
+      font-size: 12px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+    .simple-table tbody tr:hover {
+      background: #f8fbff;
+    }
+    .row-selected {
+      background: #eaf2ff;
+    }
+    body[data-theme="dark"] .simple-table th,
+    body[data-theme="dark"] .simple-table td {
+      border-bottom-color: #2b3550;
+    }
+    body[data-theme="dark"] .simple-table thead {
+      background: #161d30;
+    }
+    body[data-theme="dark"] .simple-table tbody tr {
+      background: #161d30;
+    }
+    body[data-theme="dark"] .simple-table tbody tr:hover {
+      background: #232d46;
+    }
+    body[data-theme="dark"] .row-selected {
+      background: #26324d;
+    }
+    .performance-table {
+      table-layout: auto;
+    }
+    .performance-table th,
+    .performance-table td {
+      white-space: nowrap;
+      word-break: normal;
+      overflow-wrap: normal;
+    }
+    .performance-table th:first-child,
+    .performance-table td:first-child {
+      width: 260px;
+      white-space: normal;
+    }
+    .performance-table .page-subtitle {
+      display: block;
+      margin-top: 4px;
+    }
+    .status-pill,
+    .impact-pill {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 8px;
+      border-radius: 10px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .status-pill.low { background: #e5fff4; color: #16a26d; }
+    .status-pill.moderate { background: #e8efff; color: #4676f6; }
+    .status-pill.open { background: #eef4ff; color: #4676f6; }
+    .status-pill.approved,
+    .status-pill.implemented { background: #f5eaff; color: #8b2cf4; }
+    .impact-pill.clean { background: #ebfff6; color: #20a977; }
+    .impact-pill.incident { background: #fff1f1; color: #ea5d5d; }
+    body[data-theme="dark"] .status-pill.low {
+      background: #17392f;
+      color: #71e0b3;
+    }
+    body[data-theme="dark"] .status-pill.moderate,
+    body[data-theme="dark"] .status-pill.open {
+      background: #21355f;
+      color: #8bb2ff;
+    }
+    body[data-theme="dark"] .status-pill.approved,
+    body[data-theme="dark"] .status-pill.implemented {
+      background: #312454;
+      color: #cfaeff;
+    }
+    body[data-theme="dark"] .impact-pill.clean {
+      background: #17392f;
+      color: #71e0b3;
+    }
+    body[data-theme="dark"] .impact-pill.incident {
+      background: #47252a;
+      color: #ff9a9a;
+    }
+    .problem-card {
+      padding: 20px 22px;
+      display: grid;
+      gap: 18px;
+    }
+    .problem-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 18px;
+    }
+    .problem-title {
+      font-size: 18px;
+      font-weight: 800;
+      margin: 0 0 10px;
+    }
+    .problem-meta,
+    .problem-due {
+      color: var(--muted);
+      font-size: 13px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .problem-sla {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+    }
+    .sla-box {
+      border-top: 1px solid var(--line);
+      padding-top: 14px;
+    }
+    .sla-box h4 {
+      margin: 0 0 8px;
+      font-size: 13px;
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+    .timeline-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 16px;
+    }
+    .timeline-stage {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 16px;
+      box-shadow: var(--shadow);
+    }
+    .timeline-stage span {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    .node-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+    .node-card {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      box-shadow: var(--shadow);
+      padding: 20px;
+    }
+    .node-title {
+      display: flex;
+      justify-content: space-between;
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 18px;
+    }
+    .node-list {
+      display: grid;
+      gap: 14px;
+    }
+    .node-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+    }
+    .node-name {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 600;
+    }
+    .node-health {
+      display: flex;
+      gap: 16px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+    .node-health strong {
+      display: block;
+      color: var(--text);
+      font-size: 14px;
+    }
+    .node-bad {
+      color: #ea5d5d;
+    }
+    .kpi-card {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      box-shadow: var(--shadow);
+      padding: 20px 18px;
+    }
+    .kpi-label {
+      color: var(--muted);
+      font-size: 12px;
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+    .kpi-value {
+      margin-top: 10px;
+      font-size: 40px;
+      font-weight: 800;
+      line-height: 1;
+    }
+    .kpi-note {
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .matrix-bar {
+      width: 84px;
+      height: 6px;
+      border-radius: 999px;
+      background: #e9edf6;
+      position: relative;
+      overflow: hidden;
+    }
+    .matrix-bar::after {
+      content: "";
+      position: absolute;
+      inset: 0 auto 0 0;
+      width: var(--fill, 90%);
+      background: #1ac08a;
+    }
+    @media (max-width: 1200px) {
+      .chart-grid,
+      .stats-grid,
+      .timeline-grid,
+      .node-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    @media (max-width: 1180px) {
+      .app-shell { grid-template-columns: 220px minmax(0, 1fr); }
+      .activity { display: none; }
+    }
+    @media (max-width: 860px) {
+      body { overflow: auto; }
+      .app-shell {
+        height: auto;
+        min-height: 100vh;
+        grid-template-columns: 1fr;
+        overflow: visible;
+      }
+      .sidebar { display: none; }
+      .workspace {
+        height: auto;
+        overflow: visible;
+      }
+      .workspace-header,
+      .conversation,
+      .composer {
+        padding-left: 16px;
+        padding-right: 16px;
+      }
+      .quick-actions { grid-template-columns: 1fr; }
+      .hero {
+        min-height: auto;
+        padding: 50px 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <!-- Left rail: role navigation and session history, matching the screenshot-driven command center layout. -->
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-badge"></div>
+        <div>
+          <div class="brand-title" id="brandTitle">{{ brand_name }}</div>
+          <div class="brand-subtitle" id="brandSubtitle">Agentic IT Operations</div>
+        </div>
+      </div>
+
+      <div class="nav-group">
+        <button class="nav-item active" data-nav="home" onclick="showHome()"><span class="icon">⌘</span><span id="navHomeLabel">{{ brand_name }} Hub</span></button>
+        <button class="nav-item" data-nav="incidents" onclick="showIncidents()"><span class="icon">◌</span>Incidents</button>
+        <button class="nav-item" data-nav="problems" onclick="showProblems()"><span class="icon">◌</span>Problems</button>
+        <button class="nav-item" data-nav="changes" onclick="showChanges()"><span class="icon">⇄</span>Changes</button>
+        <button class="nav-item" data-nav="observability" onclick="showObservability()"><span class="icon">◫</span>Observability</button>
+        <button class="nav-item" data-nav="performance" onclick="showAgentPerformance()"><span class="icon">⚙</span>Agent Performance</button>
+      </div>
+
+      <div class="session-block">
+        <div class="sidebar-row">
+          <span>Chat Sessions</span>
+          <button class="add-button" onclick="startNewSession()">+</button>
+        </div>
+        <div class="session-list" id="sessionList"></div>
+      </div>
+
+      <div class="sidebar-footer">
+        <div class="sidebar-footer-row">
+          <button class="footer-link" type="button" onclick="toggleRoleMenu()"><span class="icon">⇆</span>Switch Role</button>
+          <button class="footer-chip role-chip" type="button" onclick="toggleSupportPanel()"><span class="icon">⊙</span><span id="supportRoleLabel">Support</span></button>
+        </div>
+        <div class="utility-menu" id="supportPanel" hidden>
+          <p class="support-copy">Current operating role: <strong id="supportRoleValue">Support</strong>. Use chat for triage, approvals, KB drafting, and dashboard lookups.</p>
+          <div class="pill-row">
+            <button class="small-button" type="button" onclick="submitSupportPrompt('Open incidents needing attention')">Open incidents</button>
+            <button class="small-button secondary" type="button" onclick="submitSupportPrompt('Show pending approvals')">Pending approvals</button>
+          </div>
+        </div>
+        <div class="utility-menu" id="roleMenu" hidden></div>
+      </div>
+      <div class="sidebar-utilities">
+        <div class="theme-switcher">
+          <button class="theme-chip active" id="themeLightButton" type="button" onclick="setTheme('light')">☼ Light</button>
+          <button class="theme-chip" id="themeDarkButton" type="button" onclick="setTheme('dark')">☾ Dark</button>
+        </div>
+        <div class="profile-shell sidebar-profile">
+          <button class="profile-trigger" type="button" onclick="toggleProfileMenu()">
+            <span class="profile-avatar" id="profileAvatar">WT</span>
+            <span class="profile-trigger-label" id="profileTriggerLabel">Jerry Trampe</span>
+          </button>
+          <div class="profile-menu" id="profileMenu" hidden>
+            <div class="profile-menu-header">
+              <span class="profile-avatar" id="profileMenuAvatar">WT</span>
+              <div>
+                <div class="profile-name" id="profileMenuName">Jerry Trampe</div>
+                <div class="profile-meta" id="profileMenuMeta">Logged in • Support</div>
+              </div>
+            </div>
+            <button class="profile-menu-button" type="button" onclick="openProfilePanel()">◉ Profile</button>
+            <button class="profile-menu-button" type="button" onclick="openPersonalization()">◌ Personalization</button>
+            <button class="profile-menu-button" type="button" onclick="openSettings()">⚙ Settings</button>
+            <div class="profile-menu-divider"></div>
+            <button class="profile-menu-button" type="button" onclick="openHelpPanel()">? Help</button>
+            <button class="profile-menu-button" id="profileAuthButton" type="button" onclick="toggleAuthState()">⇢ Log out</button>
+          </div>
+        </div>
+        <div class="powered-by">Powered by Azure OpenAI</div>
+      </div>
+    </aside>
+
+    <!-- Center pane: conversational workspace that can switch between prompts, cards, and RCA/CAP artifacts. -->
+    <section class="workspace">
+      <div class="workspace-header">
+        <div class="workspace-title" id="workspaceTitle">{{ title }}</div>
+        <div class="header-actions">
+          <div class="health" id="platformHealth" tabindex="0">
+            <span class="health-dot"></span>
+            <span id="platformHealthLabel">System Healthy</span>
+            <div class="health-tooltip" id="platformHealthTooltip" hidden>
+              <div class="health-tooltip-title" id="platformHealthTooltipTitle">System Healthy</div>
+              <ul class="health-tooltip-list" id="platformHealthTooltipList"></ul>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="workspace-body">
+        <div class="conversation">
+          <div class="conversation-inner" id="conversationRoot"></div>
+        </div>
+        <div class="composer">
+          <div class="composer-inner">
+            <button class="composer-tool" type="button" aria-label="Start new conversation" onclick="startNewSession()">⟲</button>
+          <input id="composerInput" type="text" placeholder="Message {{ brand_name }}..." />
+            <button class="composer-tool" type="button" aria-label="Clear message" title="Clear message" onclick="clearComposerInput()">⌫</button>
+            <button class="send-button" onclick="handleComposer()">↑</button>
+          </div>
+          <div class="experience">
+            <span>Rate your experience</span>
+            <div class="experience-icons">
+              <button type="button" data-rating="poor" onclick="rateLatestResponse('poor')">☹</button>
+              <button type="button" data-rating="fair" onclick="rateLatestResponse('fair')">◔</button>
+              <button type="button" data-rating="good" onclick="rateLatestResponse('good')">◕</button>
+              <button type="button" data-rating="great" onclick="rateLatestResponse('great')">☺</button>
+              <button type="button" data-rating="excellent" onclick="rateLatestResponse('excellent')">★</button>
+            </div>
+          </div>
+          <div class="experience-feedback" id="experienceFeedback">Rate the latest assistant response.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Right rail: a compact operational feed for agent activity and platform health. -->
+    <aside class="activity">
+      <div class="activity-header">
+        <div class="activity-title">Live Agent Feed</div>
+      </div>
+      <div class="feed" id="feedRoot"></div>
+      <div class="metric-strip" id="metricStrip"></div>
+    </aside>
+  </div>
+  <div class="settings-overlay" id="settingsOverlay" hidden>
+    <div class="settings-panel">
+      <div class="settings-header">
+        <div>
+          <h2 class="settings-title">Platform Settings</h2>
+          <div class="page-subtitle">Configure personas, agent instructions, connectors, and ITIL-aligned SLA/KPI targets.</div>
+        </div>
+        <button class="icon-button" type="button" aria-label="Close settings" onclick="closeSettings()">✕</button>
+      </div>
+      <div class="settings-body">
+        <div class="settings-tab-row">
+          <button class="settings-tab-button" type="button" data-settings-tab="naming" onclick="setSettingsTab('naming')">Naming & Brand</button>
+          <button class="settings-tab-button" type="button" data-settings-tab="user-personas" onclick="setSettingsTab('user-personas')">User Persona</button>
+          <button class="settings-tab-button" type="button" data-settings-tab="agent-personas" onclick="setSettingsTab('agent-personas')">Agent Persona & Instructions</button>
+          <button class="settings-tab-button" type="button" data-settings-tab="connectors" onclick="setSettingsTab('connectors')">Connectors</button>
+          <button class="settings-tab-button" type="button" data-settings-tab="metrics" onclick="setSettingsTab('metrics')">Metrics & SLA</button>
+        </div>
+
+        <section class="settings-tab-panel" data-settings-panel="naming">
+          <section class="settings-card">
+            <div>
+              <h3>Naming & Branding</h3>
+              <p>Rename the assistant and command center labels used across the application.</p>
+            </div>
+            <div class="settings-grid two-column">
+              <div class="settings-field">
+                <label for="settingsBrandName">Assistant / Brand Name</label>
+                <input id="settingsBrandName" type="text" placeholder="Assistant name">
+              </div>
+              <div class="settings-field">
+                <label for="settingsCommandCenterTitle">Command Center Title</label>
+                <input id="settingsCommandCenterTitle" type="text" placeholder="Command center title">
+              </div>
+              <div class="settings-field">
+                <label for="settingsPlatformTitle">Platform Title</label>
+                <input id="settingsPlatformTitle" type="text" placeholder="Platform title">
+              </div>
+              <div class="settings-field">
+                <label for="settingsSidebarSubtitle">Sidebar Subtitle</label>
+                <input id="settingsSidebarSubtitle" type="text" placeholder="Agentic IT Operations">
+              </div>
+            </div>
+          </section>
+        </section>
+
+        <section class="settings-tab-panel" data-settings-panel="user-personas" hidden>
+          <section class="settings-card">
+            <div>
+              <h3>User Persona Prompts</h3>
+              <p id="userPersonaHelpCopy">Configure how {{ brand_name }} should respond when each user persona is selected.</p>
+            </div>
+            <div class="persona-grid" id="userPersonaSettingsRoot"></div>
+          </section>
+        </section>
+
+        <section class="settings-tab-panel" data-settings-panel="agent-personas" hidden>
+          <section class="settings-card">
+            <div>
+              <h3>Agent Persona Prompts</h3>
+              <p id="agentPersonaHelpCopy">Configure the runtime persona for {{ brand_name }} and each operational agent.</p>
+            </div>
+            <div class="persona-grid" id="agentPersonaSettingsRoot"></div>
+          </section>
+          <section class="settings-card">
+            <div>
+              <h3>General Instructions</h3>
+              <p id="generalInstructionHelpCopy">Shared prompt guidance applied across {{ brand_name }} and all agents.</p>
+            </div>
+            <div class="settings-field">
+              <label for="settingsGeneralPlatform">Platform Instruction</label>
+              <textarea id="settingsGeneralPlatform"></textarea>
+            </div>
+            <div class="settings-field">
+              <label for="settingsGeneralResponseStyle">Response Style</label>
+              <textarea id="settingsGeneralResponseStyle"></textarea>
+            </div>
+            <div class="settings-field">
+              <label for="settingsGeneralApprovalPolicy">Approval Policy</label>
+              <textarea id="settingsGeneralApprovalPolicy"></textarea>
+            </div>
+          </section>
+        </section>
+
+        <section class="settings-tab-panel" data-settings-panel="connectors" hidden>
+          <div class="settings-grid two-column">
+            <section class="settings-card">
+              <div>
+                <h3>ServiceNow</h3>
+                <p>System-of-record integration for incidents, problems, changes, and knowledge drafts.</p>
+              </div>
+              <label class="settings-toggle"><input type="checkbox" id="settingsServiceNowEnabled"> Enable ServiceNow</label>
+              <div class="settings-field">
+                <label for="settingsServiceNowBaseUrl">Instance URL</label>
+                <input id="settingsServiceNowBaseUrl" type="text" placeholder="https://instance.service-now.com">
+              </div>
+              <div class="settings-field">
+                <label for="settingsServiceNowDomain">Default Domain</label>
+                <input id="settingsServiceNowDomain" type="text" placeholder="Enterprise Operations">
+              </div>
+              <div class="settings-field">
+                <label for="settingsServiceNowUsername">Username</label>
+                <input id="settingsServiceNowUsername" type="text" placeholder="svc_powerplatform">
+              </div>
+              <div class="settings-field">
+                <label for="settingsServiceNowPassword">Password</label>
+                <input id="settingsServiceNowPassword" type="password" placeholder="ServiceNow password">
+              </div>
+              <div class="settings-field">
+                <label for="settingsServiceNowIncidentLimit">Incident Page Limit</label>
+                <input id="settingsServiceNowIncidentLimit" type="number" min="25" max="1000" placeholder="200">
+              </div>
+              <label class="settings-toggle"><input type="checkbox" id="settingsServiceNowVerifySsl"> Verify SSL</label>
+              <div class="connector-test-row">
+                <button class="small-button secondary" type="button" onclick="testConnector('servicenow')">Test ServiceNow</button>
+                <div class="connector-test-status" id="connectorTestStatus-servicenow"></div>
+              </div>
+            </section>
+
+            <section class="settings-card">
+              <div>
+                <h3>SharePoint</h3>
+                <p>Additional knowledge documents and repository metadata for retrieval-augmented guidance.</p>
+              </div>
+              <div class="settings-field">
+                <label for="settingsGraphEnabled">Enable Microsoft Graph</label>
+                <input id="settingsGraphEnabled" type="checkbox">
+              </div>
+              <div class="settings-field">
+                <label for="settingsGraphTenantId">Tenant ID</label>
+                <input id="settingsGraphTenantId" type="text" placeholder="Microsoft Entra tenant id">
+              </div>
+              <div class="settings-field">
+                <label for="settingsGraphClientId">Client ID</label>
+                <input id="settingsGraphClientId" type="text" placeholder="Microsoft Graph app client id">
+              </div>
+              <div class="settings-field">
+                <label for="settingsGraphClientSecret">Client Secret</label>
+                <input id="settingsGraphClientSecret" type="password" placeholder="Microsoft Graph app client secret">
+              </div>
+              <label class="settings-toggle"><input type="checkbox" id="settingsSharePointEnabled"> Enable SharePoint retrieval</label>
+              <div class="settings-field">
+                <label for="settingsSharePointSiteId">Site ID</label>
+                <input id="settingsSharePointSiteId" type="text" placeholder="SharePoint site id">
+              </div>
+              <div class="settings-field">
+                <label for="settingsSharePointDriveId">Drive ID</label>
+                <input id="settingsSharePointDriveId" type="text" placeholder="Optional drive id">
+              </div>
+              <div class="settings-field">
+                <label for="settingsSharePointRepository">Repository Label</label>
+                <input id="settingsSharePointRepository" type="text" placeholder="Knowledge repository name">
+              </div>
+              <div class="connector-test-row">
+                <button class="small-button secondary" type="button" onclick="testConnector('sharepoint')">Test SharePoint</button>
+                <div class="connector-test-status" id="connectorTestStatus-sharepoint"></div>
+              </div>
+            </section>
+
+            <section class="settings-card">
+              <div>
+                <h3>Outlook</h3>
+                <p>Email notifications for approvals, sync outcomes, and escalation updates.</p>
+              </div>
+              <label class="settings-toggle"><input type="checkbox" id="settingsOutlookEnabled"> Enable Outlook notifications</label>
+              <div class="settings-field">
+                <label for="settingsOutlookSender">Sender Mailbox</label>
+                <input id="settingsOutlookSender" type="text" placeholder="svc_ops@contoso.com">
+              </div>
+              <div class="settings-field">
+                <label for="settingsOutlookRecipients">Notification Recipients</label>
+                <input id="settingsOutlookRecipients" type="text" placeholder="ops@example.com,manager@example.com">
+              </div>
+              <div class="connector-test-row">
+                <button class="small-button secondary" type="button" onclick="testConnector('outlook')">Test Outlook</button>
+                <div class="connector-test-status" id="connectorTestStatus-outlook"></div>
+              </div>
+            </section>
+
+            <section class="settings-card">
+              <div>
+                <h3>Teams</h3>
+                <p>Approval cards and sync notices for the operational review channel.</p>
+              </div>
+              <label class="settings-toggle"><input type="checkbox" id="settingsTeamsEnabled"> Enable Teams notifications</label>
+              <div class="settings-field">
+                <label for="settingsTeamsTeamId">Team ID</label>
+                <input id="settingsTeamsTeamId" type="text" placeholder="Target team id">
+              </div>
+              <div class="settings-field">
+                <label for="settingsTeamsChannelId">Channel ID</label>
+                <input id="settingsTeamsChannelId" type="text" placeholder="Target channel id">
+              </div>
+              <div class="settings-field">
+                <label for="settingsTeamsApprovalMode">Approval Mode</label>
+                <select id="settingsTeamsApprovalMode">
+                  <option value="approval_cards">Approval Cards</option>
+                  <option value="notifications_only">Notifications Only</option>
+                </select>
+              </div>
+              <div class="connector-test-row">
+                <button class="small-button secondary" type="button" onclick="testConnector('teams')">Test Teams</button>
+                <div class="connector-test-status" id="connectorTestStatus-teams"></div>
+              </div>
+            </section>
+          </div>
+        </section>
+
+        <section class="settings-tab-panel" data-settings-panel="metrics" hidden>
+          <section class="settings-card">
+            <div>
+              <h3>SLA Targets by Priority</h3>
+              <p>Response and resolution targets used for ITIL-style service management.</p>
+            </div>
+            <div class="sla-grid">
+              <div class="sla-card">
+                <h3>P1 Critical</h3>
+                <div class="settings-field"><label for="settingsSlaP1Response">Response Minutes</label><input id="settingsSlaP1Response" type="number" min="0"></div>
+                <div class="settings-field"><label for="settingsSlaP1Resolution">Resolution Hours</label><input id="settingsSlaP1Resolution" type="number" min="0"></div>
+              </div>
+              <div class="sla-card">
+                <h3>P2 High</h3>
+                <div class="settings-field"><label for="settingsSlaP2Response">Response Minutes</label><input id="settingsSlaP2Response" type="number" min="0"></div>
+                <div class="settings-field"><label for="settingsSlaP2Resolution">Resolution Hours</label><input id="settingsSlaP2Resolution" type="number" min="0"></div>
+              </div>
+              <div class="sla-card">
+                <h3>P3 Moderate</h3>
+                <div class="settings-field"><label for="settingsSlaP3Response">Response Minutes</label><input id="settingsSlaP3Response" type="number" min="0"></div>
+                <div class="settings-field"><label for="settingsSlaP3Resolution">Resolution Hours</label><input id="settingsSlaP3Resolution" type="number" min="0"></div>
+              </div>
+              <div class="sla-card">
+                <h3>P4 Low</h3>
+                <div class="settings-field"><label for="settingsSlaP4Response">Response Minutes</label><input id="settingsSlaP4Response" type="number" min="0"></div>
+                <div class="settings-field"><label for="settingsSlaP4Resolution">Resolution Hours</label><input id="settingsSlaP4Resolution" type="number" min="0"></div>
+              </div>
+            </div>
+          </section>
+          <section class="settings-card">
+            <div>
+              <h3>ITIL Metrics & KPI Targets</h3>
+              <p>Configure high-signal metrics used to judge adoption, service quality, governance, and outcomes.</p>
+            </div>
+            <div class="settings-grid two-column">
+              <div class="settings-field"><label for="settingsKpiMttrTarget">MTTR Target (Hours)</label><input id="settingsKpiMttrTarget" type="number" min="0"></div>
+              <div class="settings-field"><label for="settingsKpiFcr">First Contact Resolution (%)</label><input id="settingsKpiFcr" type="number" min="0" max="100"></div>
+              <div class="settings-field"><label for="settingsKpiChangeSuccess">Change Success Rate (%)</label><input id="settingsKpiChangeSuccess" type="number" min="0" max="100"></div>
+              <div class="settings-field"><label for="settingsKpiKnowledgeReuse">Knowledge Reuse (%)</label><input id="settingsKpiKnowledgeReuse" type="number" min="0" max="100"></div>
+              <div class="settings-field"><label for="settingsKpiApprovalSla">Approval SLA (Minutes)</label><input id="settingsKpiApprovalSla" type="number" min="0"></div>
+              <div class="settings-field"><label for="settingsKpiCsat">CSAT Target (%)</label><input id="settingsKpiCsat" type="number" min="0" max="100"></div>
+            </div>
+          </section>
+        </section>
+
+        <div class="settings-actions">
+          <div class="settings-status" id="settingsStatus">Changes are saved locally to the platform runtime settings file.</div>
+          <div class="pill-row">
+            <button class="small-button secondary" type="button" onclick="closeSettings()">Cancel</button>
+            <button class="small-button" type="button" onclick="saveSettings()">Save Settings</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="settings-overlay" id="profileOverlay" hidden>
+    <div class="settings-panel" style="width:min(560px,100%)">
+      <div class="settings-header">
+        <div>
+          <h2 class="settings-title">Profile</h2>
+          <div class="page-subtitle">User details and current operating role.</div>
+        </div>
+        <button class="icon-button" type="button" aria-label="Close profile" onclick="closeProfilePanel()">✕</button>
+      </div>
+      <div class="settings-body">
+        <div class="profile-detail-card">
+          <div class="profile-menu-header" style="border-bottom:none;margin:0;padding:0">
+            <span class="profile-avatar" id="profilePanelAvatar">WT</span>
+            <div>
+              <div class="profile-name" id="profilePanelName">Jerry Trampe</div>
+              <div class="profile-meta" id="profilePanelMeta">jerry.trampe@example.com</div>
+            </div>
+          </div>
+          <div class="settings-field">
+            <label>Current Role</label>
+            <input id="profilePanelRole" type="text" readonly>
+          </div>
+          <div class="settings-field">
+            <label>Session Status</label>
+            <input id="profilePanelStatus" type="text" readonly>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="settings-overlay" id="helpOverlay" hidden>
+    <div class="settings-panel" style="width:min(640px,100%)">
+      <div class="settings-header">
+        <div>
+          <h2 class="settings-title">Help</h2>
+          <div class="page-subtitle" id="helpSubtitle">How to use {{ title }}.</div>
+        </div>
+        <button class="icon-button" type="button" aria-label="Close help" onclick="closeHelpPanel()">✕</button>
+      </div>
+      <div class="settings-body">
+        <div class="profile-detail-card">
+          <h3>What You Can Do</h3>
+          <p>Ask for incident status, resolution guidance, RCA/CAP drafts, knowledge lookups, approvals, and filtered operational views.</p>
+          <p>Use <strong>Switch Role</strong> to change persona context, <strong>Settings</strong> to configure connectors and prompts, and the profile menu to access personalization and account controls.</p>
+          <p id="helpApprovalCopy">All recommendations stay human-approved. {{ brand_name }} will not perform autonomous production actions.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    const PLATFORM_NAME = {{ platform_name|tojson }};
+    const BRAND_NAME = {{ brand_name|tojson }};
+    const COMMAND_CENTER_TITLE = {{ title|tojson }};
+    const state = {
+      // Frontend state stays intentionally small: one dashboard snapshot plus the visible conversation history.
+      dashboard: null,
+      conversation: [],
+      currentView: "home",
+      currentRole: "Support",
+      theme: "light",
+      incidentFilters: {
+        search: "",
+        status: "all",
+        priority: "all",
+        timeWindow: "all",
+        page: 1,
+        pageSize: 100
+      },
+      problemFilters: {
+        dueWindow: "all"
+      },
+      activeSessionId: "new-chat",
+      nextMessageId: 1,
+      sessionSnapshots: {},
+      runtimeSettings: null,
+      settingsTab: "naming",
+      connectorTests: {},
+      incidentViewData: [],
+      incidentSlaSummary: null,
+      incidentLiveStatus: null,
+      incidentPagination: null,
+      incidentSearchTimer: null,
+      profile: {
+        name: "Jerry Trampe",
+        email: "jerry.trampe@example.com",
+        loggedIn: true
+      },
+      sessions: [
+        { id: "new-chat", title: "New Chat", meta: "Ready", kind: "default" }
+      ]
+    };
+
+    const roleOptions = [
+      "Support",
+      "Process Owner",
+      "Application Owner",
+      "Incident Manager",
+      "Problem Manager",
+      "Knowledge Manager",
+      "Client Delivery Manager"
+    ];
+    const agentOptions = [
+      ["orchestration_agent", BRAND_NAME],
+      ["incident_agent", "Incident Agent"],
+      ["knowledge_agent", "Knowledge Agent"],
+      ["problem_agent", "Problem / RCA Agent"],
+      ["postmortem_agent", "Blameless Postmortem Agent"],
+      ["governance_agent", "Monitoring & Governance Agent"]
+    ];
+
+    const ratingLabels = {
+      poor: "Poor",
+      fair: "Fair",
+      good: "Good",
+      great: "Great",
+      excellent: "Excellent"
+    };
+    const storageKeys = {
+      sessionState: "command-center-session-state-v1",
+      sessionStateLegacy: ["ai-concierge-session-state-v1"],
+      role: "command-center-role",
+      roleLegacy: ["ai-concierge-role"],
+      theme: "command-center-theme",
+      themeLegacy: ["ai-concierge-theme"],
+      ratingPrefix: "command-center-rating-"
+    };
+
+    const ratingIcons = {
+      poor: "☹",
+      fair: "◔",
+      good: "◕",
+      great: "☺",
+      excellent: "★"
+    };
+
+    function defaultRuntimeSettings() {
+      const brandName = BRAND_NAME || "SwiftAssist AI";
+      const commandCenterTitle = COMMAND_CENTER_TITLE || `${brandName} Command Center`;
+      return {
+        naming: {
+          brand_name: brandName,
+          assistant_name: brandName,
+          command_center_title: commandCenterTitle,
+          platform_title: PLATFORM_NAME || `${brandName} Platform`,
+          sidebar_subtitle: "Agentic IT Operations"
+        },
+        connectors: {
+          servicenow: {
+            enabled: true,
+            base_url: "",
+            default_domain: "",
+            verify_ssl: false,
+            username: "",
+            password: "",
+            incident_page_limit: 200
+          },
+          sharepoint: {
+            enabled: false,
+            site_id: "",
+            drive_id: "",
+            repository: ""
+          },
+          outlook: {
+            enabled: false,
+            sender: "",
+            recipients: ""
+          },
+          teams: {
+            enabled: false,
+            team_id: "",
+            channel_id: "",
+            approval_mode: "approval_cards"
+          }
+        },
+        user_personas: Object.fromEntries(
+          roleOptions.map(role => [
+            role,
+            `You are operating as the ${role} for ${commandCenterTitle}. Prioritize human-approved, approval-first guidance and communicate in concise operational terms.`
+          ])
+        ),
+        personas: Object.fromEntries(
+          roleOptions.map(role => [
+            role,
+            `You are operating as the ${role} for ${commandCenterTitle}. Prioritize human-approved, approval-first guidance and communicate in concise operational terms.`
+          ])
+        ),
+        agent_personas: Object.fromEntries(
+          agentOptions.map(([key, label]) => [
+            key,
+            `You are ${label} within ${commandCenterTitle}. Stay approval-first, evidence-based, and operationally concise.`
+          ])
+        ),
+        general_instructions: {
+          platform: "Preserve human accountability, governance, and operational safety.",
+          response_style: "Use concise operational language and call out uncertainty explicitly.",
+          approval_policy: "No autonomous remediation, closure, publication, or production changes are allowed."
+        },
+        metrics: {
+          sla: {
+            P1: { response_minutes: 15, resolution_hours: 4 },
+            P2: { response_minutes: 30, resolution_hours: 8 },
+            P3: { response_minutes: 60, resolution_hours: 24 },
+            P4: { response_minutes: 240, resolution_hours: 72 }
+          },
+          kpis: {
+            mttr_target_hours: 8,
+            first_contact_resolution_pct: 65,
+            change_success_rate_pct: 95,
+            knowledge_reuse_pct: 70,
+            approval_sla_minutes: 30,
+            csat_target_pct: 90
+          }
+        }
+      };
+    }
+
+    function getNamingSettings() {
+      const defaults = defaultRuntimeSettings().naming;
+      const runtime = state.runtimeSettings?.naming || {};
+      const brandName = String(runtime.brand_name || defaults.brand_name).trim() || defaults.brand_name;
+      const assistantName = String(runtime.assistant_name || brandName).trim() || brandName;
+      const commandCenterTitle = String(
+        runtime.command_center_title || `${brandName} Command Center`
+      ).trim() || `${brandName} Command Center`;
+      const platformTitle = String(
+        runtime.platform_title || `${brandName} Platform`
+      ).trim() || `${brandName} Platform`;
+      const sidebarSubtitle = String(
+        runtime.sidebar_subtitle || defaults.sidebar_subtitle
+      ).trim() || defaults.sidebar_subtitle;
+      return {
+        brand_name: brandName,
+        assistant_name: assistantName,
+        command_center_title: commandCenterTitle,
+        platform_title: platformTitle,
+        sidebar_subtitle: sidebarSubtitle
+      };
+    }
+
+    function getBrandName() {
+      return getNamingSettings().brand_name;
+    }
+
+    function getAssistantName() {
+      return getNamingSettings().assistant_name;
+    }
+
+    function getCommandCenterTitle() {
+      return getNamingSettings().command_center_title;
+    }
+
+    function applyBranding() {
+      const naming = getNamingSettings();
+      const brandTitle = document.getElementById("brandTitle");
+      const brandSubtitle = document.getElementById("brandSubtitle");
+      const navHomeLabel = document.getElementById("navHomeLabel");
+      const workspaceTitle = document.getElementById("workspaceTitle");
+      const composerInput = document.getElementById("composerInput");
+      const helpSubtitle = document.getElementById("helpSubtitle");
+      const helpApprovalCopy = document.getElementById("helpApprovalCopy");
+      const userPersonaHelpCopy = document.getElementById("userPersonaHelpCopy");
+      const agentPersonaHelpCopy = document.getElementById("agentPersonaHelpCopy");
+      const generalInstructionHelpCopy = document.getElementById("generalInstructionHelpCopy");
+      if (brandTitle) {
+        brandTitle.textContent = naming.brand_name;
+      }
+      if (brandSubtitle) {
+        brandSubtitle.textContent = naming.sidebar_subtitle;
+      }
+      if (navHomeLabel) {
+        navHomeLabel.textContent = `${naming.brand_name} Hub`;
+      }
+      if (workspaceTitle) {
+        workspaceTitle.textContent = naming.command_center_title;
+      }
+      if (composerInput) {
+        composerInput.placeholder = `Message ${naming.assistant_name}...`;
+      }
+      if (helpSubtitle) {
+        helpSubtitle.textContent = `How to use ${naming.command_center_title}.`;
+      }
+      if (helpApprovalCopy) {
+        helpApprovalCopy.textContent = `All recommendations stay human-approved. ${naming.assistant_name} will not perform autonomous production actions.`;
+      }
+      if (userPersonaHelpCopy) {
+        userPersonaHelpCopy.textContent = `Configure how ${naming.assistant_name} should respond when each user persona is selected.`;
+      }
+      if (agentPersonaHelpCopy) {
+        agentPersonaHelpCopy.textContent = `Configure the runtime persona for ${naming.assistant_name} and each operational agent.`;
+      }
+      if (generalInstructionHelpCopy) {
+        generalInstructionHelpCopy.textContent = `Shared prompt guidance applied across ${naming.assistant_name} and all agents.`;
+      }
+      document.title = naming.command_center_title;
+    }
+
+    function readStoredValue(key, fallback, legacyKeys = []) {
+      try {
+        const directValue = window.localStorage.getItem(key);
+        if (directValue !== null) {
+          return directValue;
+        }
+        for (const legacyKey of legacyKeys) {
+          const legacyValue = window.localStorage.getItem(legacyKey);
+          if (legacyValue !== null) {
+            return legacyValue;
+          }
+        }
+        return fallback;
+      } catch (error) {
+        return fallback;
+      }
+    }
+
+    function storeValue(key, value) {
+      try {
+        window.localStorage.setItem(key, value);
+      } catch (error) {
+        console.warn(`Could not persist ${key}`, error);
+      }
+    }
+
+    function saveSessionState() {
+      try {
+        const payload = {
+          sessions: state.sessions,
+          sessionSnapshots: state.sessionSnapshots,
+          activeSessionId: state.activeSessionId,
+          nextMessageId: state.nextMessageId,
+          profile: state.profile
+        };
+          window.localStorage.setItem(storageKeys.sessionState, JSON.stringify(payload));
+      } catch (error) {
+        console.warn("Could not persist session state", error);
+      }
+    }
+
+    function loadSessionState() {
+      try {
+          const raw =
+            window.localStorage.getItem(storageKeys.sessionState)
+            || storageKeys.sessionStateLegacy.map(key => window.localStorage.getItem(key)).find(Boolean);
+        if (!raw) {
+          return;
+        }
+        const payload = JSON.parse(raw);
+        if (Array.isArray(payload.sessions) && payload.sessions.length) {
+          state.sessions = payload.sessions;
+        }
+        if (payload.sessionSnapshots && typeof payload.sessionSnapshots === "object") {
+          state.sessionSnapshots = payload.sessionSnapshots;
+        }
+        if (typeof payload.activeSessionId === "string") {
+          state.activeSessionId = payload.activeSessionId;
+        }
+        if (typeof payload.nextMessageId === "number" && Number.isFinite(payload.nextMessageId)) {
+          state.nextMessageId = payload.nextMessageId;
+        }
+        if (payload.profile && typeof payload.profile === "object") {
+          state.profile = {
+            ...state.profile,
+            ...payload.profile
+          };
+        }
+        if (!state.sessions.some(session => session.id === "new-chat")) {
+          state.sessions.push({ id: "new-chat", title: "New Chat", meta: "Ready", kind: "default" });
+        }
+        if (!state.sessions.some(session => session.id === state.activeSessionId)) {
+          state.activeSessionId = "new-chat";
+        }
+        if (!state.sessionSnapshots["new-chat"]) {
+          state.sessionSnapshots["new-chat"] = captureSessionSnapshot();
+        }
+        restoreSessionSnapshot(state.sessionSnapshots[state.activeSessionId]);
+      } catch (error) {
+        console.warn("Could not restore session state", error);
+      }
+    }
+
+    function createMessage(role, payload = {}) {
+      return {
+        id: `msg-${state.nextMessageId++}`,
+        role,
+        ...payload
+      };
+    }
+
+    function cloneValue(value) {
+      if (typeof structuredClone === "function") {
+        return structuredClone(value);
+      }
+      return JSON.parse(JSON.stringify(value));
+    }
+
+    function mergeSettings(base, overrides) {
+      const merged = cloneValue(base);
+      Object.entries(overrides || {}).forEach(([key, value]) => {
+        if (
+          value
+          && typeof value === "object"
+          && !Array.isArray(value)
+          && merged[key]
+          && typeof merged[key] === "object"
+          && !Array.isArray(merged[key])
+        ) {
+          merged[key] = mergeSettings(merged[key], value);
+        } else {
+          merged[key] = value;
+        }
+      });
+      return merged;
+    }
+
+    function captureSessionSnapshot() {
+      return {
+        currentView: state.currentView,
+        conversation: cloneValue(state.conversation),
+        incidentFilters: cloneValue(state.incidentFilters),
+        problemFilters: cloneValue(state.problemFilters),
+        incidentViewData: cloneValue(state.incidentViewData || []),
+        incidentSlaSummary: cloneValue(state.incidentSlaSummary || null),
+        incidentLiveStatus: cloneValue(state.incidentLiveStatus || null),
+        incidentPagination: cloneValue(state.incidentPagination || null)
+      };
+    }
+
+    function restoreSessionSnapshot(snapshot) {
+      if (!snapshot) {
+        return false;
+      }
+      state.currentView = snapshot.currentView || "home";
+      state.conversation = cloneValue(snapshot.conversation || []);
+      state.incidentFilters = {
+        search: "",
+        status: "all",
+        priority: "all",
+        timeWindow: "all",
+        page: 1,
+        pageSize: 100,
+        ...(snapshot.incidentFilters || {})
+      };
+      state.incidentViewData = cloneValue(snapshot.incidentViewData || []);
+      state.incidentSlaSummary = cloneValue(snapshot.incidentSlaSummary || null);
+      state.incidentLiveStatus = cloneValue(snapshot.incidentLiveStatus || null);
+      state.incidentPagination = cloneValue(snapshot.incidentPagination || null);
+      state.problemFilters = {
+        dueWindow: "all",
+        ...(snapshot.problemFilters || {})
+      };
+      return true;
+    }
+
+    function persistActiveSessionSnapshot() {
+      if (!state.activeSessionId) {
+        return;
+      }
+      state.sessionSnapshots[state.activeSessionId] = captureSessionSnapshot();
+      saveSessionState();
+    }
+
+    function setSettingsStatus(message) {
+      const node = document.getElementById("settingsStatus");
+      if (node) {
+        node.textContent = message;
+      }
+    }
+
+    function renderUserPersonaSettings() {
+      const root = document.getElementById("userPersonaSettingsRoot");
+      if (!root) {
+        return;
+      }
+      const personas = state.runtimeSettings?.user_personas || state.runtimeSettings?.personas || defaultRuntimeSettings().user_personas;
+      const assistantName = getAssistantName();
+      root.innerHTML = roleOptions.map(role => {
+        const personaId = `user-persona-${role.toLowerCase().replaceAll(" ", "-")}`;
+        return `
+          <div class="persona-block">
+            <h3>${escapeHtml(role)}</h3>
+            <p>Prompt guidance used when this persona is selected for the current user role with ${escapeHtml(assistantName)}.</p>
+            <div class="settings-field">
+              <label for="${personaId}">Persona Prompt</label>
+              <textarea id="${personaId}" data-role-persona="${escapeHtml(role)}">${escapeHtml(personas[role] || "")}</textarea>
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function renderAgentPersonaSettings() {
+      const root = document.getElementById("agentPersonaSettingsRoot");
+      if (!root) {
+        return;
+      }
+      const personas = state.runtimeSettings?.agent_personas || defaultRuntimeSettings().agent_personas;
+        root.innerHTML = agentOptions.map(([key, label]) => {
+          const resolvedLabel = key === "orchestration_agent" ? getAssistantName() : label;
+        const personaId = `agent-persona-${key}`;
+        return `
+          <div class="persona-block">
+            <h3>${escapeHtml(resolvedLabel)}</h3>
+            <p>Prompt guidance applied to this agent's runtime instructions.</p>
+            <div class="settings-field">
+              <label for="${personaId}">Agent Persona Prompt</label>
+              <textarea id="${personaId}" data-agent-persona="${escapeHtml(key)}">${escapeHtml(personas[key] || "")}</textarea>
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function renderGeneralInstructionSettings() {
+      const settings = state.runtimeSettings || defaultRuntimeSettings();
+      const general = settings.general_instructions || defaultRuntimeSettings().general_instructions;
+      const nodes = {
+        platform: document.getElementById("settingsGeneralPlatform"),
+        response_style: document.getElementById("settingsGeneralResponseStyle"),
+        approval_policy: document.getElementById("settingsGeneralApprovalPolicy")
+      };
+      Object.entries(nodes).forEach(([key, node]) => {
+        if (node) {
+          node.value = general[key] || "";
+        }
+      });
+    }
+
+    function renderSettingsTabs() {
+      document.querySelectorAll("[data-settings-tab]").forEach(button => {
+        button.classList.toggle("active", button.dataset.settingsTab === state.settingsTab);
+      });
+      document.querySelectorAll("[data-settings-panel]").forEach(panel => {
+        panel.hidden = panel.dataset.settingsPanel !== state.settingsTab;
+      });
+    }
+
+    function setSettingsTab(tabId) {
+      state.settingsTab = tabId;
+      renderSettingsTabs();
+    }
+
+    function profileInitials() {
+      const parts = String(state.profile.name || `${getAssistantName()} User`)
+        .split(" ")
+        .filter(Boolean)
+        .slice(0, 2);
+      return parts.map(part => part[0]?.toUpperCase() || "").join("") || "WU";
+    }
+
+    function getUserAvatarInitials() {
+      return profileInitials();
+    }
+
+    function syncProfileUi() {
+      const initials = profileInitials();
+      const authLabel = state.profile.loggedIn ? "Logged in" : "Logged out";
+      const triggerLabel = document.getElementById("profileTriggerLabel");
+      const avatarNodes = [
+        document.getElementById("profileAvatar"),
+        document.getElementById("profileMenuAvatar"),
+        document.getElementById("profilePanelAvatar")
+      ];
+      avatarNodes.forEach(node => {
+        if (node) {
+          node.textContent = initials;
+        }
+      });
+      if (triggerLabel) {
+        triggerLabel.textContent = state.profile.name;
+      }
+      const menuName = document.getElementById("profileMenuName");
+      const menuMeta = document.getElementById("profileMenuMeta");
+      if (menuName) {
+        menuName.textContent = state.profile.name;
+      }
+      if (menuMeta) {
+        menuMeta.textContent = `${authLabel} • ${state.currentRole}`;
+      }
+      const panelName = document.getElementById("profilePanelName");
+      const panelMeta = document.getElementById("profilePanelMeta");
+      const panelRole = document.getElementById("profilePanelRole");
+      const panelStatus = document.getElementById("profilePanelStatus");
+      if (panelName) {
+        panelName.textContent = state.profile.name;
+      }
+      if (panelMeta) {
+        panelMeta.textContent = state.profile.email;
+      }
+      if (panelRole) {
+        panelRole.value = state.currentRole;
+      }
+      if (panelStatus) {
+        panelStatus.value = authLabel;
+      }
+      const authButton = document.getElementById("profileAuthButton");
+      if (authButton) {
+        authButton.textContent = state.profile.loggedIn ? "⇢ Log out" : "⇠ Log in";
+      }
+      saveSessionState();
+    }
+
+    function closeProfileMenu() {
+      document.getElementById("profileMenu")?.setAttribute("hidden", "");
+    }
+
+    function toggleProfileMenu() {
+      const menu = document.getElementById("profileMenu");
+      const isHidden = menu.hasAttribute("hidden");
+      closeUtilityPanels();
+      if (isHidden) {
+        menu.removeAttribute("hidden");
+      } else {
+        menu.setAttribute("hidden", "");
+      }
+    }
+
+    function openProfilePanel() {
+      closeProfileMenu();
+      syncProfileUi();
+      document.getElementById("profileOverlay")?.removeAttribute("hidden");
+    }
+
+    function closeProfilePanel() {
+      document.getElementById("profileOverlay")?.setAttribute("hidden", "");
+    }
+
+    function openHelpPanel() {
+      closeProfileMenu();
+      document.getElementById("helpOverlay")?.removeAttribute("hidden");
+    }
+
+    function closeHelpPanel() {
+      document.getElementById("helpOverlay")?.setAttribute("hidden", "");
+    }
+
+    function openPersonalization() {
+      closeProfileMenu();
+      openSettings();
+      setSettingsTab("user-personas");
+      setSettingsStatus("Personalization is ready. Edit the user persona prompts below.");
+    }
+
+    function toggleAuthState() {
+      closeProfileMenu();
+      if (state.profile.loggedIn) {
+        state.profile.loggedIn = false;
+        state.profile.name = "Guest User";
+        state.profile.email = "Not signed in";
+      } else {
+        state.profile.loggedIn = true;
+        state.profile.name = "Jerry Trampe";
+        state.profile.email = "jerry.trampe@example.com";
+      }
+      syncProfileUi();
+    }
+
+    function renderSettingsForm() {
+      const settings = state.runtimeSettings || defaultRuntimeSettings();
+      const naming = settings.naming || defaultRuntimeSettings().naming;
+      const servicenow = settings.connectors.servicenow || {};
+      const microsoftGraph = settings.connectors.microsoft_graph || {};
+      const sharepoint = settings.connectors.sharepoint || {};
+      const outlook = settings.connectors.outlook || {};
+      const teams = settings.connectors.teams || {};
+      const sla = settings.metrics?.sla || defaultRuntimeSettings().metrics.sla;
+      const kpis = settings.metrics?.kpis || defaultRuntimeSettings().metrics.kpis;
+      document.getElementById("settingsBrandName").value = naming.brand_name || "";
+      document.getElementById("settingsCommandCenterTitle").value = naming.command_center_title || "";
+      document.getElementById("settingsPlatformTitle").value = naming.platform_title || "";
+      document.getElementById("settingsSidebarSubtitle").value = naming.sidebar_subtitle || "";
+      document.getElementById("settingsServiceNowEnabled").checked = Boolean(servicenow.enabled);
+      document.getElementById("settingsServiceNowBaseUrl").value = servicenow.base_url || "";
+      document.getElementById("settingsServiceNowDomain").value = servicenow.default_domain || "";
+      document.getElementById("settingsServiceNowUsername").value = servicenow.username || "";
+      document.getElementById("settingsServiceNowPassword").value = servicenow.password || "";
+      document.getElementById("settingsServiceNowIncidentLimit").value = servicenow.incident_page_limit ?? 200;
+      document.getElementById("settingsServiceNowVerifySsl").checked = Boolean(servicenow.verify_ssl);
+      document.getElementById("settingsGraphEnabled").checked = Boolean(microsoftGraph.enabled);
+      document.getElementById("settingsGraphTenantId").value = microsoftGraph.tenant_id || "";
+      document.getElementById("settingsGraphClientId").value = microsoftGraph.client_id || "";
+      document.getElementById("settingsGraphClientSecret").value = microsoftGraph.client_secret || "";
+      document.getElementById("settingsSharePointEnabled").checked = Boolean(sharepoint.enabled);
+      document.getElementById("settingsSharePointSiteId").value = sharepoint.site_id || "";
+      document.getElementById("settingsSharePointDriveId").value = sharepoint.drive_id || "";
+      document.getElementById("settingsSharePointRepository").value = sharepoint.repository || "";
+      document.getElementById("settingsOutlookEnabled").checked = Boolean(outlook.enabled);
+      document.getElementById("settingsOutlookSender").value = outlook.sender || "";
+      document.getElementById("settingsOutlookRecipients").value = outlook.recipients || "";
+      document.getElementById("settingsTeamsEnabled").checked = Boolean(teams.enabled);
+      document.getElementById("settingsTeamsTeamId").value = teams.team_id || "";
+      document.getElementById("settingsTeamsChannelId").value = teams.channel_id || "";
+      document.getElementById("settingsTeamsApprovalMode").value = teams.approval_mode || "approval_cards";
+      ["P1", "P2", "P3", "P4"].forEach(priority => {
+        document.getElementById(`settingsSla${priority}Response`).value = sla[priority]?.response_minutes ?? "";
+        document.getElementById(`settingsSla${priority}Resolution`).value = sla[priority]?.resolution_hours ?? "";
+      });
+      document.getElementById("settingsKpiMttrTarget").value = kpis.mttr_target_hours ?? "";
+      document.getElementById("settingsKpiFcr").value = kpis.first_contact_resolution_pct ?? "";
+      document.getElementById("settingsKpiChangeSuccess").value = kpis.change_success_rate_pct ?? "";
+      document.getElementById("settingsKpiKnowledgeReuse").value = kpis.knowledge_reuse_pct ?? "";
+      document.getElementById("settingsKpiApprovalSla").value = kpis.approval_sla_minutes ?? "";
+      document.getElementById("settingsKpiCsat").value = kpis.csat_target_pct ?? "";
+      renderUserPersonaSettings();
+      renderAgentPersonaSettings();
+      renderGeneralInstructionSettings();
+      renderSettingsTabs();
+      applyBranding();
+    }
+
+    async function loadRuntimeSettings() {
+      try {
+        const response = await api("/api/settings");
+        state.runtimeSettings = mergeSettings(defaultRuntimeSettings(), response);
+      } catch (error) {
+        console.warn("Settings load failed, using defaults.", error);
+        state.runtimeSettings = defaultRuntimeSettings();
+      }
+      renderSettingsForm();
+    }
+
+    function openSettings() {
+      closeProfileMenu();
+      renderSettingsForm();
+      document.getElementById("settingsOverlay")?.removeAttribute("hidden");
+      setSettingsStatus("Changes are saved locally to the platform runtime settings file.");
+    }
+
+    function closeSettings() {
+      document.getElementById("settingsOverlay")?.setAttribute("hidden", "");
+    }
+
+    function collectSettingsForm() {
+      const userPersonas = {};
+      const agentPersonas = {};
+      document.querySelectorAll("[data-role-persona]").forEach(node => {
+        userPersonas[node.getAttribute("data-role-persona")] = node.value.trim();
+      });
+      document.querySelectorAll("[data-agent-persona]").forEach(node => {
+        agentPersonas[node.getAttribute("data-agent-persona")] = node.value.trim();
+      });
+      return {
+        naming: {
+          brand_name: document.getElementById("settingsBrandName").value.trim(),
+          assistant_name: document.getElementById("settingsBrandName").value.trim(),
+          command_center_title: document.getElementById("settingsCommandCenterTitle").value.trim(),
+          platform_title: document.getElementById("settingsPlatformTitle").value.trim(),
+          sidebar_subtitle: document.getElementById("settingsSidebarSubtitle").value.trim()
+        },
+        connectors: {
+          servicenow: {
+            enabled: document.getElementById("settingsServiceNowEnabled").checked,
+            base_url: document.getElementById("settingsServiceNowBaseUrl").value.trim(),
+            default_domain: document.getElementById("settingsServiceNowDomain").value.trim(),
+            username: document.getElementById("settingsServiceNowUsername").value.trim(),
+            password: document.getElementById("settingsServiceNowPassword").value,
+            incident_page_limit: Number(document.getElementById("settingsServiceNowIncidentLimit").value || 200),
+            verify_ssl: document.getElementById("settingsServiceNowVerifySsl").checked
+          },
+          microsoft_graph: {
+            enabled: document.getElementById("settingsGraphEnabled").checked,
+            tenant_id: document.getElementById("settingsGraphTenantId").value.trim(),
+            client_id: document.getElementById("settingsGraphClientId").value.trim(),
+            client_secret: document.getElementById("settingsGraphClientSecret").value
+          },
+          sharepoint: {
+            enabled: document.getElementById("settingsSharePointEnabled").checked,
+            site_id: document.getElementById("settingsSharePointSiteId").value.trim(),
+            drive_id: document.getElementById("settingsSharePointDriveId").value.trim(),
+            repository: document.getElementById("settingsSharePointRepository").value.trim()
+          },
+          outlook: {
+            enabled: document.getElementById("settingsOutlookEnabled").checked,
+            sender: document.getElementById("settingsOutlookSender").value.trim(),
+            recipients: document.getElementById("settingsOutlookRecipients").value.trim()
+          },
+          teams: {
+            enabled: document.getElementById("settingsTeamsEnabled").checked,
+            team_id: document.getElementById("settingsTeamsTeamId").value.trim(),
+            channel_id: document.getElementById("settingsTeamsChannelId").value.trim(),
+            approval_mode: document.getElementById("settingsTeamsApprovalMode").value
+          }
+        },
+        user_personas: userPersonas,
+        personas: userPersonas,
+        agent_personas: agentPersonas,
+        general_instructions: {
+          platform: document.getElementById("settingsGeneralPlatform").value.trim(),
+          response_style: document.getElementById("settingsGeneralResponseStyle").value.trim(),
+          approval_policy: document.getElementById("settingsGeneralApprovalPolicy").value.trim()
+        },
+        metrics: {
+          sla: {
+            P1: {
+              response_minutes: Number(document.getElementById("settingsSlaP1Response").value || 0),
+              resolution_hours: Number(document.getElementById("settingsSlaP1Resolution").value || 0)
+            },
+            P2: {
+              response_minutes: Number(document.getElementById("settingsSlaP2Response").value || 0),
+              resolution_hours: Number(document.getElementById("settingsSlaP2Resolution").value || 0)
+            },
+            P3: {
+              response_minutes: Number(document.getElementById("settingsSlaP3Response").value || 0),
+              resolution_hours: Number(document.getElementById("settingsSlaP3Resolution").value || 0)
+            },
+            P4: {
+              response_minutes: Number(document.getElementById("settingsSlaP4Response").value || 0),
+              resolution_hours: Number(document.getElementById("settingsSlaP4Resolution").value || 0)
+            }
+          },
+          kpis: {
+            mttr_target_hours: Number(document.getElementById("settingsKpiMttrTarget").value || 0),
+            first_contact_resolution_pct: Number(document.getElementById("settingsKpiFcr").value || 0),
+            change_success_rate_pct: Number(document.getElementById("settingsKpiChangeSuccess").value || 0),
+            knowledge_reuse_pct: Number(document.getElementById("settingsKpiKnowledgeReuse").value || 0),
+            approval_sla_minutes: Number(document.getElementById("settingsKpiApprovalSla").value || 0),
+            csat_target_pct: Number(document.getElementById("settingsKpiCsat").value || 0)
+          }
+        }
+      };
+    }
+
+    async function saveSettings() {
+      const payload = collectSettingsForm();
+      setSettingsStatus("Saving settings...");
+      try {
+        const response = await api("/api/settings", {
+          method: "PUT",
+          body: JSON.stringify(payload)
+        });
+        state.runtimeSettings = mergeSettings(defaultRuntimeSettings(), response);
+        renderSettingsForm();
+        applyBranding();
+        renderCurrentView();
+        setSettingsStatus("Settings saved. New chat requests and agent runs will use the updated personas, connectors, and KPI targets.");
+      } catch (error) {
+        setSettingsStatus(`Settings save failed: ${error.message}`);
+      }
+    }
+
+    async function testConnector(connectorName) {
+      const statusNode = document.getElementById(`connectorTestStatus-${connectorName}`);
+      if (statusNode) {
+        statusNode.textContent = "Testing...";
+        statusNode.className = "connector-test-status pending";
+      }
+      try {
+        const payload = collectSettingsForm();
+        const saved = await api("/api/settings", {
+          method: "PUT",
+          body: JSON.stringify(payload)
+        });
+        state.runtimeSettings = mergeSettings(defaultRuntimeSettings(), saved);
+        const result = await api(`/api/settings/test-connector/${connectorName}`, { method: "POST" });
+        state.connectorTests[connectorName] = result;
+        if (statusNode) {
+          const details = result.details ? ` • ${Object.entries(result.details).map(([key, value]) => `${key}: ${value}`).join(" | ")}` : "";
+          statusNode.textContent = `${result.ok ? "Connected" : result.status}: ${result.message}${details}`;
+          statusNode.className = `connector-test-status ${result.ok ? "success" : result.status === "disabled" || result.status === "not_configured" ? "warning" : "error"}`;
+        }
+      } catch (error) {
+        if (statusNode) {
+          statusNode.textContent = `Failed: ${error.message}`;
+          statusNode.className = "connector-test-status error";
+        }
+      }
+    }
+
+    state.currentRole = roleOptions.includes(readStoredValue(storageKeys.role, "Support", storageKeys.roleLegacy))
+      ? readStoredValue(storageKeys.role, "Support", storageKeys.roleLegacy)
+      : "Support";
+    state.theme = readStoredValue(storageKeys.theme, "light", storageKeys.themeLegacy) === "dark" ? "dark" : "light";
+    state.sessionSnapshots["new-chat"] = captureSessionSnapshot();
+    loadSessionState();
+
+    async function api(path, options) {
+      const response = await fetch(path, {
+        headers: { "Content-Type": "application/json" },
+        ...options
+      });
+      if (!response.ok) {
+        const body = await response.json().catch(() => null);
+        const message = body?.error?.message || response.statusText;
+        throw new Error(message);
+      }
+      return response.json();
+    }
+
+    function nowTime() {
+      return new Date().toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#39;");
+    }
+
+    function formatDate(value) {
+      if (!value) {
+        return "N/A";
+      }
+      const date = new Date(value);
+      if (Number.isNaN(date.getTime())) {
+        return escapeHtml(value);
+      }
+      return date.toLocaleDateString();
+    }
+
+    function formatDateTime(value) {
+      if (!value) {
+        return "No activity yet";
+      }
+      const date = new Date(value);
+      if (Number.isNaN(date.getTime())) {
+        return escapeHtml(value);
+      }
+      return date.toLocaleString([], {
+        month: "short",
+        day: "numeric",
+        hour: "numeric",
+        minute: "2-digit"
+      });
+    }
+
+    function priorityLabel(severity) {
+      const normalized = Number(severity) || 4;
+      const mapping = {
+        1: "P1 - Critical",
+        2: "P2 - High",
+        3: "P3 - Moderate",
+        4: "P4 - Low"
+      };
+      return mapping[normalized] || "P4 - Low";
+    }
+
+    function priorityClass(severity) {
+      const normalized = Number(severity) || 4;
+      const mapping = {
+        1: "critical",
+        2: "high",
+        3: "moderate",
+        4: "low"
+      };
+      return mapping[normalized] || "low";
+    }
+
+    function incidentStatusLabel(status) {
+      const mapping = {
+        all: "All Incidents",
+        open: "Open Incidents",
+        resolved: "Resolved",
+        closed: "Closed"
+      };
+      return mapping[status] || "All Incidents";
+    }
+
+    function incidentPriorityFilterLabel(priority) {
+      const mapping = {
+        all: "All Priorities",
+        1: "P1 Only",
+        2: "P2 Only",
+        3: "P3 Only",
+        4: "P4 Only"
+      };
+      return mapping[priority] || "All Priorities";
+    }
+
+    function incidentTimeWindowLabel(timeWindow) {
+      const mapping = {
+        all: "All Dates",
+        this_week: "This Week"
+      };
+      return mapping[timeWindow] || "All Dates";
+    }
+
+    function startOfCurrentWeek() {
+      const now = new Date();
+      const start = new Date(now);
+      const day = start.getDay();
+      const diff = day === 0 ? 6 : day - 1;
+      start.setDate(start.getDate() - diff);
+      start.setHours(0, 0, 0, 0);
+      return start;
+    }
+
+    function filteredIncidents() {
+      return state.incidentViewData || [];
+    }
+
+    function incidentPageSize() {
+      return 100;
+    }
+
+    async function refreshIncidentsData() {
+      const params = new URLSearchParams();
+      params.set("status", state.incidentFilters.status);
+      params.set("priority", state.incidentFilters.priority);
+      params.set("time_window", state.incidentFilters.timeWindow);
+      const pageSize = incidentPageSize();
+      const currentPage = Math.max(1, Number(state.incidentFilters.page || 1));
+      params.set("limit", String(pageSize));
+      params.set("offset", String((currentPage - 1) * pageSize));
+      if (state.incidentFilters.search) {
+        params.set("search", state.incidentFilters.search);
+      }
+      const startedAt = performance.now();
+      const payload = await api(`/api/incidents/overview?${params.toString()}`);
+      const durationMs = Math.round(performance.now() - startedAt);
+      state.incidentViewData = payload.incidents || [];
+      state.incidentSlaSummary = payload.sla_summary || null;
+      state.incidentPagination = payload.pagination || {
+        offset: (currentPage - 1) * pageSize,
+        limit: pageSize,
+        count: state.incidentViewData.length,
+        has_more: false,
+        range_start: state.incidentViewData.length ? ((currentPage - 1) * pageSize) + 1 : 0,
+        range_end: ((currentPage - 1) * pageSize) + state.incidentViewData.length
+      };
+      state.incidentLiveStatus = {
+        ...(payload.live_status || {}),
+        duration_ms: durationMs
+      };
+    }
+
+    function summarizeIncidentLiveStatus() {
+      const status = state.incidentLiveStatus || state.dashboard?.metrics?.servicenow_live || {};
+      const durationMs = Number(status.duration_ms || 0);
+      const slowThresholdMs = 2500;
+      if (status.connected === false) {
+        return {
+          label: "Disconnected",
+          className: "failure",
+          detail: status.reason || "ServiceNow is unavailable. Showing local data only."
+        };
+      }
+      if (status.connected && durationMs >= slowThresholdMs) {
+        return {
+          label: "Live",
+          className: "warning",
+          detail: `${status.reason || "Connected to ServiceNow."} Data processing is slow (${durationMs} ms).`
+        };
+      }
+      if (status.connected) {
+        return {
+          label: "Live",
+          className: "",
+          detail: status.reason || "Connected to ServiceNow."
+        };
+      }
+      return {
+        label: "Disconnected",
+        className: "failure",
+        detail: "ServiceNow status is unknown. Showing local data only."
+      };
+    }
+
+    async function cycleIncidentStatusFilter() {
+      const order = ["all", "open", "resolved", "closed"];
+      const nextIndex = (order.indexOf(state.incidentFilters.status) + 1) % order.length;
+      state.incidentFilters.status = order[nextIndex];
+      state.incidentFilters.page = 1;
+      await refreshIncidentsData();
+      renderIncidentsPage();
+    }
+
+    async function cycleIncidentPriorityFilter() {
+      const order = ["all", "1", "2", "3", "4"];
+      const nextIndex = (order.indexOf(state.incidentFilters.priority) + 1) % order.length;
+      state.incidentFilters.priority = order[nextIndex];
+      state.incidentFilters.page = 1;
+      await refreshIncidentsData();
+      renderIncidentsPage();
+    }
+
+    function restoreIncidentSearchFocus() {
+      const input = document.getElementById("incidentSearchInput");
+      if (!input) {
+        return;
+      }
+      input.focus();
+      const cursorPosition = input.value.length;
+      input.setSelectionRange(cursorPosition, cursorPosition);
+    }
+
+    function updateIncidentSearch(value) {
+      state.incidentFilters.search = value;
+      state.incidentFilters.page = 1;
+      if (state.incidentSearchTimer) {
+        clearTimeout(state.incidentSearchTimer);
+      }
+      state.incidentSearchTimer = setTimeout(async () => {
+        await refreshIncidentsData();
+        renderIncidentsPage();
+        restoreIncidentSearchFocus();
+      }, 250);
+    }
+
+    async function cycleIncidentTimeWindowFilter() {
+      state.incidentFilters.timeWindow = state.incidentFilters.timeWindow === "all" ? "this_week" : "all";
+      state.incidentFilters.page = 1;
+      await refreshIncidentsData();
+      renderIncidentsPage();
+    }
+
+    async function goToIncidentPage(nextPage) {
+      const targetPage = Math.max(1, Number(nextPage || 1));
+      if (targetPage === Number(state.incidentFilters.page || 1)) {
+        return;
+      }
+      state.incidentFilters.page = targetPage;
+      await refreshIncidentsData();
+      renderIncidentsPage();
+    }
+
+    function problemDueWindowLabel(dueWindow) {
+      const mapping = {
+        all: "All Due Dates",
+        this_week: "Due This Week"
+      };
+      return mapping[dueWindow] || "All Due Dates";
+    }
+
+    function problemRcaDueDate(problem) {
+      const createdAt = new Date(problem.created_at);
+      createdAt.setDate(createdAt.getDate() + 7);
+      return createdAt;
+    }
+
+    function problemCapDueDate(problem) {
+      const createdAt = new Date(problem.created_at);
+      createdAt.setDate(createdAt.getDate() + 18);
+      return createdAt;
+    }
+
+    function daysUntil(targetDate) {
+      const now = new Date();
+      const diffMs = targetDate - now;
+      return Math.max(0, Math.ceil(diffMs / (1000 * 60 * 60 * 24)));
+    }
+
+    function formatPercentage(value, digits = 0) {
+      return `${Number(value || 0).toFixed(digits)}%`;
+    }
+
+    function titleCase(value) {
+      return String(value || "n/a")
+        .replaceAll("_", " ")
+        .split(" ")
+        .filter(Boolean)
+        .map(part => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase())
+        .join(" ");
+    }
+
+    function serviceDomainMap() {
+      const map = new Map();
+      [
+        ...(state.dashboard?.incidents || []),
+        ...(state.dashboard?.problems || []),
+        ...(state.dashboard?.changes || [])
+      ].forEach(record => {
+        if (record?.service) {
+          map.set(record.service, record.domain || map.get(record.service) || "Platform");
+        }
+      });
+      return map;
+    }
+
+    function incidentAssistanceBreakdown(incidents) {
+      const incidentIds = new Set((incidents || []).map(item => item.id));
+      const aiAssistedIds = new Set(
+        (state.dashboard?.outputs || [])
+          .filter(output => output.target_type === "incident" && incidentIds.has(output.target_id))
+          .map(output => output.target_id)
+      );
+      const aiAssisted = aiAssistedIds.size;
+      const humanLed = Math.max((incidents || []).length - aiAssisted, 0);
+      const total = Math.max(aiAssisted + humanLed, 1);
+      const aiShare = Math.round((aiAssisted / total) * 100);
+      return {
+        aiAssisted,
+        humanLed,
+        aiShare,
+        humanShare: 100 - aiShare,
+      };
+    }
+
+    function formatDurationMinutes(totalMinutes) {
+      const minutes = Math.max(Number(totalMinutes) || 0, 0);
+      if (minutes >= 60) {
+        const hours = minutes / 60;
+        return hours >= 10 ? `${Math.round(hours)}h` : `${hours.toFixed(1)}h`;
+      }
+      return `${Math.round(minutes)}m`;
+    }
+
+    function buildObservabilityGroups() {
+      const incidents = state.dashboard?.incidents || [];
+      const problems = state.dashboard?.problems || [];
+      const changes = state.dashboard?.changes || [];
+      const knowledgeArticles = state.dashboard?.knowledge_articles || [];
+      const telemetrySignals = state.dashboard?.telemetry_signals || [];
+      const serviceDomains = serviceDomainMap();
+      const services = new Map();
+
+      function ensureService(serviceName, domainName = "Platform") {
+        if (!serviceName) {
+          return null;
+        }
+        if (!services.has(serviceName)) {
+          services.set(serviceName, {
+            name: serviceName,
+            domain: domainName || serviceDomains.get(serviceName) || "Platform",
+            openIncidents: 0,
+            signalCount: 0,
+            knowledgeCount: 0,
+            latestCategory: "none",
+            latestSeverity: "none",
+            latestObservedAt: null,
+          });
+        }
+        return services.get(serviceName);
+      }
+
+      [...incidents, ...problems, ...changes].forEach(record => {
+        ensureService(record.service, record.domain);
+      });
+
+      incidents.forEach(incident => {
+        const entry = ensureService(incident.service, incident.domain);
+        if (entry && !["resolved", "closed"].includes(String(incident.status).toLowerCase())) {
+          entry.openIncidents += 1;
+        }
+      });
+
+      knowledgeArticles.forEach(article => {
+        (article.services || []).forEach(serviceName => {
+          const entry = ensureService(serviceName, serviceDomains.get(serviceName) || "Platform");
+          if (entry) {
+            entry.knowledgeCount += 1;
+          }
+        });
+      });
+
+      telemetrySignals.forEach(signal => {
+        const entry = ensureService(signal.service, serviceDomains.get(signal.service) || "Platform");
+        if (!entry) {
+          return;
+        }
+        entry.signalCount += 1;
+        const observedAt = signal.observed_at ? new Date(signal.observed_at) : null;
+        const latestObservedAt = entry.latestObservedAt ? new Date(entry.latestObservedAt) : null;
+        if (!latestObservedAt || (observedAt && observedAt > latestObservedAt)) {
+          entry.latestCategory = signal.category;
+          entry.latestSeverity = signal.severity;
+          entry.latestObservedAt = signal.observed_at;
+        }
+      });
+
+      const groups = new Map();
+      Array.from(services.values())
+        .sort((left, right) => left.name.localeCompare(right.name))
+        .forEach(service => {
+          if (!groups.has(service.domain)) {
+            groups.set(service.domain, []);
+          }
+          groups.get(service.domain).push({
+            ...service,
+            alert: ["critical", "high"].includes(String(service.latestSeverity).toLowerCase()) || service.openIncidents > 0,
+          });
+        });
+
+      return Array.from(groups.entries())
+        .sort((left, right) => left[0].localeCompare(right[0]))
+        .map(([domain, items]) => ({
+          domain,
+          services: items,
+        }));
+    }
+
+    function filteredProblems() {
+      const problems = state.dashboard?.problems || [];
+      const startOfWeek = startOfCurrentWeek();
+      const endOfWeek = new Date(startOfWeek);
+      endOfWeek.setDate(endOfWeek.getDate() + 7);
+      return problems.filter(problem => {
+        if (state.problemFilters.dueWindow === "all") {
+          return true;
+        }
+        const rcaDue = problemRcaDueDate(problem);
+        const capDue = problemCapDueDate(problem);
+        return (rcaDue >= startOfWeek && rcaDue < endOfWeek) || (capDue >= startOfWeek && capDue < endOfWeek);
+      });
+    }
+
+    function cycleProblemDueWindowFilter() {
+      state.problemFilters.dueWindow = state.problemFilters.dueWindow === "all" ? "this_week" : "all";
+      renderProblemsPage();
+    }
+
+    function upsertSession(session) {
+      const existing = state.sessions.findIndex(item => item.id === session.id);
+      if (existing >= 0) {
+        state.sessions[existing] = session;
+      } else {
+        state.sessions.unshift(session);
+      }
+      state.activeSessionId = session.id;
+      persistActiveSessionSnapshot();
+      renderSessions();
+    }
+
+    function renderSessions() {
+      const root = document.getElementById("sessionList");
+      root.innerHTML = state.sessions.map(session => `
+        <div class="session-item ${session.id === state.activeSessionId ? "active" : ""}" role="button" tabindex="0" onclick="activateSession('${session.id}')" onkeydown="if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); activateSession('${session.id}'); }">
+          <span class="icon">${session.kind === "report" ? "▣" : "□"}</span>
+          <span class="session-main">
+            <span class="session-title">${escapeHtml(session.title)}</span>
+            <span class="session-meta">${escapeHtml(session.meta)}</span>
+          </span>
+          ${session.id !== "new-chat" ? `
+            <span class="session-actions" onclick="event.stopPropagation()">
+              <button class="session-action" type="button" title="Rename session" onclick="renameSession('${session.id}')">✎</button>
+              <button class="session-action" type="button" title="Delete session" onclick="deleteSession('${session.id}')">✕</button>
+            </span>
+          ` : ""}
+        </div>
+      `).join("");
+      saveSessionState();
+    }
+
+    function renameSession(sessionId) {
+      const session = state.sessions.find(item => item.id === sessionId);
+      if (!session) {
+        return;
+      }
+      const nextTitle = window.prompt("Rename session", session.title);
+      if (!nextTitle) {
+        return;
+      }
+      session.title = nextTitle.trim() || session.title;
+      renderSessions();
+    }
+
+    function deleteSession(sessionId) {
+      if (sessionId === "new-chat") {
+        return;
+      }
+      const session = state.sessions.find(item => item.id === sessionId);
+      if (!session) {
+        return;
+      }
+      const shouldDelete = window.confirm(`Delete session "${session.title}"?`);
+      if (!shouldDelete) {
+        return;
+      }
+      state.sessions = state.sessions.filter(item => item.id !== sessionId);
+      delete state.sessionSnapshots[sessionId];
+      if (state.activeSessionId === sessionId) {
+        state.activeSessionId = "new-chat";
+        restoreSessionSnapshot(state.sessionSnapshots["new-chat"]);
+        renderCurrentView();
+      }
+      renderSessions();
+    }
+
+    function activateSession(sessionId) {
+      persistActiveSessionSnapshot();
+      state.activeSessionId = sessionId;
+      renderSessions();
+      if (restoreSessionSnapshot(state.sessionSnapshots[sessionId])) {
+        renderCurrentView();
+        return;
+      }
+      if (sessionId === "new-chat") {
+        showHome();
+      }
+    }
+
+    function startNewSession() {
+      persistActiveSessionSnapshot();
+      const sessionId = `chat-${Date.now()}`;
+      state.sessionSnapshots[sessionId] = {
+        currentView: "home",
+        conversation: [],
+        incidentFilters: { search: "", status: "all", priority: "all", timeWindow: "all" },
+        problemFilters: { dueWindow: "all" }
+      };
+      upsertSession({ id: sessionId, title: "New Chat", meta: "Ready", kind: "default" });
+      restoreSessionSnapshot(state.sessionSnapshots[sessionId]);
+      renderCurrentView();
+    }
+
+    function setActiveNav(navId) {
+      document.querySelectorAll("[data-nav]").forEach(item => {
+        item.classList.toggle("active", item.dataset.nav === navId);
+      });
+    }
+
+    function iconSvg(name) {
+      const glyphs = { incidents: "◌", problems: "▣", knowledge: "⌕", report: "✣" };
+      return `<span class="icon">${glyphs[name] || "•"}</span>`;
+    }
+
+    function syncRoleUi() {
+      const supportRoleLabel = document.getElementById("supportRoleLabel");
+      const supportRoleValue = document.getElementById("supportRoleValue");
+      const roleIndicatorValue = document.getElementById("roleIndicatorValue");
+      if (supportRoleLabel) {
+        supportRoleLabel.textContent = state.currentRole;
+      }
+      if (supportRoleValue) {
+        supportRoleValue.textContent = state.currentRole;
+      }
+      if (roleIndicatorValue) {
+        roleIndicatorValue.textContent = state.currentRole;
+      }
+      const roleMenu = document.getElementById("roleMenu");
+      if (roleMenu) {
+        roleMenu.innerHTML = roleOptions.map(role => `
+          <button class="role-option ${role === state.currentRole ? "active" : ""}" type="button" onclick="setRole('${escapeHtml(role)}')">${escapeHtml(role)}</button>
+        `).join("");
+      }
+    }
+
+    function closeUtilityPanels() {
+      document.getElementById("supportPanel")?.setAttribute("hidden", "");
+      document.getElementById("roleMenu")?.setAttribute("hidden", "");
+    }
+
+    function toggleSupportPanel() {
+      const panel = document.getElementById("supportPanel");
+      const isHidden = panel.hasAttribute("hidden");
+      closeUtilityPanels();
+      if (isHidden) {
+        panel.removeAttribute("hidden");
+      }
+    }
+
+    function toggleRoleMenu() {
+      const panel = document.getElementById("roleMenu");
+      const isHidden = panel.hasAttribute("hidden");
+      closeUtilityPanels();
+      if (isHidden) {
+        panel.removeAttribute("hidden");
+      }
+    }
+
+    function setRole(role) {
+      state.currentRole = roleOptions.includes(role) ? role : "Support";
+      storeValue(storageKeys.role, state.currentRole);
+      syncRoleUi();
+      syncProfileUi();
+      closeUtilityPanels();
+    }
+
+    function syncThemeUi() {
+      document.body.dataset.theme = state.theme;
+      document.getElementById("themeLightButton")?.classList.toggle("active", state.theme === "light");
+      document.getElementById("themeDarkButton")?.classList.toggle("active", state.theme === "dark");
+    }
+
+    function setTheme(theme) {
+      state.theme = theme === "dark" ? "dark" : "light";
+      storeValue(storageKeys.theme, state.theme);
+      syncThemeUi();
+    }
+
+    function submitSupportPrompt(message) {
+      closeUtilityPanels();
+      submitChatMessage(message, {
+        sessionId: `support-${Date.now()}`,
+        title: `${state.currentRole} request`,
+        meta: state.currentRole
+      });
+    }
+
+    function getLatestAssistantMessage() {
+      for (let index = state.conversation.length - 1; index >= 0; index -= 1) {
+        if (state.conversation[index].role === "assistant" && state.conversation[index].kind !== "loading") {
+          return state.conversation[index];
+        }
+      }
+      return null;
+    }
+
+    function renderResponseRating(message) {
+      if (!message?.rating) {
+        return "";
+      }
+      const icon = ratingIcons[message.rating] || "•";
+      const label = ratingLabels[message.rating] || message.rating;
+      return `<div class="response-rating-note">${escapeHtml(icon)} ${escapeHtml(label)}</div>`;
+    }
+
+    function syncExperienceUi() {
+      const latestAssistantMessage = getLatestAssistantMessage();
+      const activeRating = latestAssistantMessage?.rating || "";
+      document.querySelectorAll(".experience-icons button").forEach(button => {
+        button.classList.toggle("active", button.dataset.rating === activeRating);
+      });
+      const feedback = document.getElementById("experienceFeedback");
+      if (!feedback) {
+        return;
+      }
+      if (!latestAssistantMessage) {
+        feedback.textContent = "Rate the latest assistant response.";
+        return;
+      }
+      feedback.textContent = activeRating
+        ? `Rated latest response as ${ratingLabels[activeRating]}.`
+        : "Select a rating for the latest assistant response.";
+    }
+
+    function rateLatestResponse(rating) {
+      const latestAssistantMessage = getLatestAssistantMessage();
+      if (!latestAssistantMessage || !ratingLabels[rating]) {
+        return;
+      }
+      latestAssistantMessage.rating = rating;
+      storeValue(`${storageKeys.ratingPrefix}${latestAssistantMessage.id}`, rating);
+      renderCurrentView();
+      syncExperienceUi();
+    }
+
+    function renderHome() {
+      const root = document.getElementById("conversationRoot");
+      root.innerHTML = `
+        <div class="hero">
+          <div class="hero-inner">
+            <div class="orb"></div>
+            <h1>Hello! I'm ${escapeHtml(getAssistantName())}<br>How can I help you today?</h1>
+            <p>Operate incidents, problems, knowledge, and governed change through approval-first AI workflows.</p>
+            <div class="quick-actions">
+              <button class="action-card blue" onclick="showIncidents({ timeWindow: 'this_week' })">${iconSvg("incidents")}<span>What incidents were opened this week?</span></button>
+              <button class="action-card pink" onclick="showProblems({ dueWindow: 'this_week' })">${iconSvg("problems")}<span>What problems are due this week?</span></button>
+              <button class="action-card lavender" onclick="generateRcaReport()">${iconSvg("report")}<span>Generate an RCA/CAP report for the top problem</span></button>
+              <button class="action-card mint" onclick="submitChatMessage('Search the knowledge base for troubleshooting steps', { sessionId: 'knowledge-search', title: 'Knowledge search', meta: 'Lookup' })">${iconSvg("knowledge")}<span>Search the knowledge base for troubleshooting steps</span></button>
+            </div>
+          </div>
+        </div>
+      `;
+      persistActiveSessionSnapshot();
+    }
+
+    function renderCurrentView() {
+      if (state.currentView === "home") {
+        renderHome();
+        syncExperienceUi();
+        return;
+      }
+      if (state.currentView === "conversation") {
+        renderConversation();
+        return;
+      }
+      if (state.currentView === "incidents") {
+        renderIncidentsPage();
+        syncExperienceUi();
+        return;
+      }
+      if (state.currentView === "problems") {
+        renderProblemsPage();
+        syncExperienceUi();
+        return;
+      }
+      if (state.currentView === "changes") {
+        renderChangesPage();
+        syncExperienceUi();
+        return;
+      }
+      if (state.currentView === "observability") {
+        renderObservabilityPage();
+        syncExperienceUi();
+        return;
+      }
+      if (state.currentView === "performance") {
+        renderPerformancePage();
+        syncExperienceUi();
+      }
+    }
+
+    function renderIncidentsPage() {
+      const visibleIncidents = filteredIncidents();
+      const pagination = state.incidentPagination || {
+        offset: 0,
+        limit: incidentPageSize(),
+        count: visibleIncidents.length,
+        has_more: false,
+        range_start: visibleIncidents.length ? 1 : 0,
+        range_end: visibleIncidents.length
+      };
+      const currentPage = Math.max(1, Number(state.incidentFilters.page || 1));
+      const hasPreviousPage = currentPage > 1;
+      const hasNextPage = Boolean(pagination.has_more);
+      const priorityCounts = [1, 2, 3, 4].map(level => visibleIncidents.filter(item => Number(item.severity) === level).length);
+      const maxPriorityCount = Math.max(...priorityCounts, 1);
+      const statusCounts = {
+        closed: visibleIncidents.filter(item => item.status.toLowerCase() === "closed").length,
+        open: visibleIncidents.filter(item => !["closed", "resolved"].includes(item.status.toLowerCase())).length,
+        resolved: visibleIncidents.filter(item => item.status.toLowerCase() === "resolved").length
+      };
+      const totalIncidents = Math.max(visibleIncidents.length, 1);
+      const resolvedShare = Math.round((statusCounts.resolved / totalIncidents) * 100);
+      const openShare = Math.round((statusCounts.open / totalIncidents) * 100);
+      const liveStatus = summarizeIncidentLiveStatus();
+      const slaBreakdown = state.incidentSlaSummary || {
+        response_minutes: 0,
+        response_target_minutes: 0,
+        resolution_minutes: 0,
+        resolution_target_minutes: 0,
+        response_pct: 0,
+        resolution_pct: 0,
+        response_state: "good",
+        resolution_state: "good",
+        response_count: 0,
+        resolution_count: 0,
+        visible_count: visibleIncidents.length,
+        source: "incident_timestamps"
+      };
+      const rows = visibleIncidents.map((incident, index) => `
+        <tr class="${index === 0 ? "row-selected" : ""}" onclick="openIncidentCard('${incident.id}')">
+          <td><strong>${incident.id}</strong></td>
+          <td><span class="status-pill ${priorityClass(incident.severity)}">${priorityLabel(incident.severity)}</span></td>
+          <td>${escapeHtml(incident.title)}</td>
+          <td>${escapeHtml(incident.assignee)}</td>
+          <td>${incident.status}</td>
+          <td>${formatDate(incident.opened_at)}</td>
+        </tr>
+      `).join("");
+
+      document.getElementById("conversationRoot").innerHTML = `
+        <div class="page-shell">
+          <div class="page-header">
+            <div>
+              <h2 class="page-title">Incident Monitoring</h2>
+            </div>
+            <div class="page-toolbar">
+              <span>Last updated: ${nowTime()}</span>
+              <button class="icon-button" type="button" aria-label="Refresh incident data" title="Refresh incident data" onclick="refreshCurrentViewData()">⟳</button>
+              <span class="live-pill ${liveStatus.className}" title="${escapeHtml(liveStatus.detail)}">${escapeHtml(liveStatus.label)}</span>
+            </div>
+          </div>
+          <div class="chart-grid">
+            <section class="chart-card">
+              <div class="chart-title">Incidents by Priority</div>
+              <div class="bar-chart">
+                ${[
+                  ["P1", priorityCounts[0], "#ff3b3b"],
+                  ["P2", priorityCounts[1], "#f6a01b"],
+                  ["P3", priorityCounts[2], "#4077f2"],
+                  ["P4", priorityCounts[3], "#12b886"]
+                ].map(item => {
+                  const scaledHeight = Math.round((item[1] / maxPriorityCount) * 176);
+                  const barHeight = item[1] > 0 ? Math.max(24, scaledHeight) : 12;
+                  return `<div class="bar"><div class="bar-visual" style="height:${barHeight}px;background:${item[2]}"></div><span>${item[0]}</span></div>`;
+                }).join("")}
+              </div>
+            </section>
+            <section class="chart-card">
+              <div class="chart-title">Incidents by Status</div>
+              <div class="donut" style="background:conic-gradient(#14c38e 0 ${resolvedShare}%, #3a74f5 ${resolvedShare}% ${resolvedShare + openShare}%, #4a5568 ${resolvedShare + openShare}% 100%);"></div>
+              <div class="legend-row"><span class="closed">Closed</span><span class="open">Open</span><span class="resolved">Resolved</span></div>
+            </section>
+            <section class="chart-card">
+              <div class="chart-title">SLA Response vs Resolution</div>
+              <div class="sla-compare">
+                <div class="sla-metric">
+                  <div class="sla-track">
+                    <div class="sla-fill ${slaBreakdown.response_state}" style="height:${Math.max(slaBreakdown.response_pct, 10)}%;"></div>
+                  </div>
+                  <div class="sla-label">Response</div>
+                  <div class="sla-value">${formatDurationMinutes(slaBreakdown.response_minutes)} avg<br>target ${formatDurationMinutes(slaBreakdown.response_target_minutes)}</div>
+                </div>
+                <div class="sla-metric">
+                  <div class="sla-track">
+                    <div class="sla-fill ${slaBreakdown.resolution_state}" style="height:${Math.max(slaBreakdown.resolution_pct, 10)}%;"></div>
+                  </div>
+                  <div class="sla-label">Resolution</div>
+                  <div class="sla-value">${formatDurationMinutes(slaBreakdown.resolution_minutes)} avg<br>target ${formatDurationMinutes(slaBreakdown.resolution_target_minutes)}</div>
+                </div>
+              </div>
+              <div class="legend-row sla-legend"><span class="response">Response time</span><span class="resolution">Resolution time</span></div>
+              <div class="chart-note sla-note">${slaBreakdown.response_count} response samples • ${slaBreakdown.resolution_count} resolution samples • ${slaBreakdown.visible_count} visible incidents</div>
+            </section>
+          </div>
+          <section class="table-card">
+            <div class="search-row">
+              <input
+                id="incidentSearchInput"
+                class="search-input"
+                type="text"
+                placeholder="Search incidents by ID, title or owner..."
+                value="${escapeHtml(state.incidentFilters.search)}"
+                oninput="updateIncidentSearch(this.value)"
+              />
+              <div class="filter-row">
+                <button class="tab-chip ${state.incidentFilters.timeWindow !== "all" ? "active" : ""}" type="button" onclick="cycleIncidentTimeWindowFilter()">${incidentTimeWindowLabel(state.incidentFilters.timeWindow)}</button>
+                <button class="tab-chip ${state.incidentFilters.status !== "all" ? "active" : ""}" type="button" onclick="cycleIncidentStatusFilter()">${incidentStatusLabel(state.incidentFilters.status)}</button>
+                <button class="tab-chip ${state.incidentFilters.priority !== "all" ? "active" : ""}" type="button" onclick="cycleIncidentPriorityFilter()">${incidentPriorityFilterLabel(state.incidentFilters.priority)}</button>
+              </div>
+            </div>
+            <table class="simple-table">
+              <thead>
+                <tr><th>ID</th><th>Priority</th><th>Title</th><th>Owner</th><th>Status</th><th>Created</th></tr>
+              </thead>
+              <tbody>${rows || `<tr><td colspan="6">No incidents match the current filters.</td></tr>`}</tbody>
+            </table>
+            <div class="search-row" style="padding-top:14px">
+              <div class="page-subtitle">
+                ${pagination.count ? `Showing ${pagination.range_start}-${pagination.range_end}` : "Showing 0 incidents"}
+              </div>
+              <div class="filter-row">
+                <button class="tab-chip" type="button" ${hasPreviousPage ? "" : "disabled"} onclick="goToIncidentPage(${currentPage - 1})">Previous ${Math.max(1, pagination.range_start - pagination.limit)}-${Math.max(0, pagination.range_start - 1)}</button>
+                <span class="tab-chip active">${pagination.count ? `${pagination.range_start}-${pagination.range_end}` : "0-0"}</span>
+                <button class="tab-chip" type="button" ${hasNextPage ? "" : "disabled"} onclick="goToIncidentPage(${currentPage + 1})">${hasNextPage ? `Next ${pagination.range_end + 1}-${pagination.range_end + pagination.limit}` : "No more incidents"}</button>
+              </div>
+            </div>
+          </section>
+        </div>
+      `;
+      persistActiveSessionSnapshot();
+    }
+
+    function renderProblemsPage() {
+      const problems = filteredProblems();
+      const cards = problems.map(problem => {
+        const rcaDueDays = daysUntil(problemRcaDueDate(problem));
+        const capDueDays = daysUntil(problemCapDueDate(problem));
+        return `
+          <article class="problem-card">
+            <div class="problem-header">
+              <div>
+                <div class="problem-title">${escapeHtml(problem.title)}</div>
+                <div class="problem-meta"><span>${escapeHtml(problem.id)}</span><span>${escapeHtml(problem.summary)}</span><span>${escapeHtml(problem.service)}</span></div>
+              </div>
+              <div class="page-subtitle">Created:<br><strong>${formatDate(problem.created_at)}</strong></div>
+            </div>
+            <div class="problem-sla">
+              <div class="sla-box">
+                <h4>RCA Status</h4>
+                <div class="problem-due"><span>◷ Due in:</span><strong>${rcaDueDays} day${rcaDueDays === 1 ? "" : "s"}</strong><span class="status-pill open">${escapeHtml(problem.status)}</span></div>
+              </div>
+              <div class="sla-box">
+                <h4>CAP Status</h4>
+                <div class="problem-due"><span>◷ Due in:</span><strong>${capDueDays} day${capDueDays === 1 ? "" : "s"}</strong><span class="status-pill open">${escapeHtml(problem.status)}</span></div>
+              </div>
+            </div>
+            <div class="pill-row" style="padding:0 24px 24px">
+              <button class="small-button" onclick="generateRcaReport('${problem.id}')">Generate RCA/CAP</button>
+            </div>
+          </article>
+        `;
+      }).join("");
+      const cardsMarkup = cards || '<article class="problem-card"><div class="problem-header"><div class="problem-title">No problem records available.</div></div></article>';
+
+      document.getElementById("conversationRoot").innerHTML = `
+        <div class="page-shell">
+          <div class="page-header">
+            <div>
+              <h2 class="page-title">Problem Management</h2>
+              <div class="page-subtitle">Tracking Root Cause Analysis (RCA) and Corrective Action Plan (CAP) SLAs</div>
+            </div>
+            <div class="page-toolbar">
+              <button class="tab-chip ${state.problemFilters.dueWindow !== "all" ? "active" : ""}" type="button" onclick="cycleProblemDueWindowFilter()">${problemDueWindowLabel(state.problemFilters.dueWindow)}</button>
+              <span>⟳ Refresh</span>
+            </div>
+          </div>
+          ${cardsMarkup}
+        </div>
+      `;
+      persistActiveSessionSnapshot();
+    }
+
+    function renderChangesPage() {
+      const changes = state.dashboard?.changes || [];
+      const rows = changes.map(change => `
+        <tr>
+          <td>${escapeHtml(change.id)}</td>
+          <td>${escapeHtml(change.title)}</td>
+          <td><span class="status-pill ${escapeHtml(change.status.toLowerCase().replaceAll(" ", "-"))}">${escapeHtml(change.status)}</span></td>
+          <td>${escapeHtml(change.service)}</td>
+          <td><span class="impact-pill ${change.status.toLowerCase().includes("approved") || change.status.toLowerCase().includes("authorized") ? "clean" : "incident"}">${change.status.toLowerCase().includes("implemented") || change.status.toLowerCase().includes("closed") ? "Clean Deployment" : "Pending Review"}</span></td>
+        </tr>
+      `).join("");
+
+      document.getElementById("conversationRoot").innerHTML = `
+        <div class="page-shell">
+          <div>
+            <h2 class="page-title">Change Management</h2>
+            <div class="page-subtitle">Change Request lifecycle and Incident Caused by Change (ICC) tracking.</div>
+          </div>
+          <div class="notice-banner">ⓘ The data displayed on this page is for demonstration purposes only and does not reflect real operational data.</div>
+          <section class="table-card">
+            <table class="simple-table">
+              <thead><tr><th>Change ID</th><th>Title</th><th>Status</th><th>Owner</th><th>Impact Analysis</th></tr></thead>
+              <tbody>${rows || `<tr><td colspan="5">No change records are available.</td></tr>`}</tbody>
+            </table>
+          </section>
+          <div class="timeline-grid">
+            <div class="timeline-stage"><span>Stage 1</span><strong>Created</strong></div>
+            <div class="timeline-stage"><span>Stage 2</span><strong>Approved</strong></div>
+            <div class="timeline-stage"><span>Stage 3</span><strong>Implemented</strong></div>
+            <div class="timeline-stage"><span>Stage 4</span><strong>Closed</strong></div>
+          </div>
+        </div>
+      `;
+      persistActiveSessionSnapshot();
+    }
+
+    function renderObservabilityPage() {
+      const groups = buildObservabilityGroups();
+      const cards = groups.map(group => `
+        <section class="node-card">
+          <div class="node-title"><span>${escapeHtml(group.domain)}</span><span class="page-subtitle">${group.services.length} service${group.services.length === 1 ? "" : "s"}</span></div>
+          <div class="node-list">
+            ${group.services.map(service => `
+              <div class="node-row">
+                <div class="node-name"><span class="${service.alert ? "node-bad" : ""}">▭</span>${escapeHtml(service.name)}</div>
+                <div class="node-health">
+                  <span>Signals<strong class="${service.alert ? "node-bad" : ""}">${service.signalCount}</strong></span>
+                  <span>Latest<strong>${escapeHtml(titleCase(service.latestCategory))}</strong></span>
+                  <span>Severity<strong class="${service.alert ? "node-bad" : ""}">${escapeHtml(titleCase(service.latestSeverity))}</strong></span>
+                  <span>Open<strong>${service.openIncidents}</strong></span>
+                  <span>KB<strong>${service.knowledgeCount}</strong></span>
+                </div>
+              </div>
+            `).join("")}
+          </div>
+        </section>
+      `).join("");
+
+      document.getElementById("conversationRoot").innerHTML = `
+        <div class="page-shell">
+          <div>
+            <h2 class="page-title">Observability & Monitoring</h2>
+            <div class="page-subtitle">Current service health derived from live telemetry, incidents, and knowledge coverage.</div>
+          </div>
+          <div class="notice-banner">ⓘ This view is computed from the current dashboard snapshot, including telemetry signals, open incidents, and linked knowledge coverage.</div>
+          <div class="node-grid">${cards || '<section class="node-card"><div class="node-title"><span>No service health data available</span></div></section>'}</div>
+        </div>
+      `;
+      persistActiveSessionSnapshot();
+    }
+
+    function renderPerformancePage() {
+      const metrics = state.dashboard?.metrics || {};
+      const performance = metrics.agent_performance || { summary: {}, rows: [] };
+      const summary = performance.summary || {};
+      const performanceRows = performance.rows || [];
+      const rows = performanceRows.map(agent => `
+        <tr>
+          <td><strong>${escapeHtml(agent.name)}</strong><div class="page-subtitle">${escapeHtml(agent.role)}</div></td>
+          <td>${escapeHtml(agent.status)}</td>
+          <td>${agent.executions}<div class="matrix-bar" style="--fill:${Math.min(agent.executions * 12, 100)}%"></div></td>
+          <td>${agent.review_backlog}</td>
+          <td><span class="status-pill ${agent.review_pass_rate >= 90 ? "low" : agent.review_pass_rate >= 70 ? "moderate" : "critical"}">${formatPercentage(agent.review_pass_rate, 1)}</span></td>
+          <td>${formatPercentage(agent.avg_confidence_pct, 1)}<div class="matrix-bar" style="--fill:${Math.max(Math.min(agent.avg_confidence_pct, 100), 8)}%"></div></td>
+          <td>${agent.avg_response_minutes == null ? "N/A" : formatDurationMinutes(agent.avg_response_minutes)}</td>
+          <td>${agent.avg_approval_turnaround_minutes == null ? "N/A" : formatDurationMinutes(agent.avg_approval_turnaround_minutes)}</td>
+          <td>${formatDateTime(agent.last_active_at)}</td>
+        </tr>
+      `).join("");
+
+      document.getElementById("conversationRoot").innerHTML = `
+        <div class="page-shell">
+          <div class="page-header">
+            <div>
+              <h2 class="page-title">Agent Performance KPIs</h2>
+          <div class="page-subtitle">Monitoring live executions, review backlog, confidence, and turnaround across ${escapeHtml(getAssistantName())}'s registered agents.</div>
+            </div>
+            <div class="filter-row">
+              <span class="tab-chip active">Live Snapshot</span>
+              <span class="tab-chip">${performanceRows.length} agents</span>
+            </div>
+          </div>
+          <div class="notice-banner">ⓘ KPI cards and the matrix below are computed on the backend from live agent outputs, runs, approvals, and target-linked timestamps.</div>
+          <div class="stats-grid">
+            <div class="kpi-card"><div class="kpi-label">Active Agents</div><div class="kpi-value">${summary.active_agents ?? 0}/${summary.registered_agents ?? 0}</div><div class="kpi-note">Agents with live executions or direct runs in the current snapshot</div></div>
+            <div class="kpi-card"><div class="kpi-label">Total Executions</div><div class="kpi-value">${summary.total_executions ?? 0}</div><div class="kpi-note">${summary.total_runs ?? 0} tracked run${summary.total_runs === 1 ? "" : "s"} across all agents</div></div>
+            <div class="kpi-card"><div class="kpi-label">Review Pass Rate</div><div class="kpi-value">${formatPercentage(summary.review_pass_rate ?? 0, 1)}</div><div class="kpi-note">${summary.rejected_outputs ?? 0} rejected output${summary.rejected_outputs === 1 ? "" : "s"} in the current snapshot</div></div>
+            <div class="kpi-card"><div class="kpi-label">Pending Approvals</div><div class="kpi-value">${summary.pending_approvals ?? 0}</div><div class="kpi-note">Human decisions still required before downstream action</div></div>
+            <div class="kpi-card"><div class="kpi-label">Avg Response Time</div><div class="kpi-value">${summary.avg_response_minutes == null ? "N/A" : formatDurationMinutes(summary.avg_response_minutes)}</div><div class="kpi-note">Average time from target creation to agent output</div></div>
+            <div class="kpi-card"><div class="kpi-label">Approval Turnaround</div><div class="kpi-value">${summary.avg_approval_turnaround_minutes == null ? "N/A" : formatDurationMinutes(summary.avg_approval_turnaround_minutes)}</div><div class="kpi-note">Average time for human approval decisions</div></div>
+            <div class="kpi-card"><div class="kpi-label">Avg Confidence</div><div class="kpi-value">${formatPercentage(summary.avg_confidence_pct ?? 0, 1)}</div><div class="kpi-note">${summary.low_confidence_outputs ?? 0} low-confidence output${summary.low_confidence_outputs === 1 ? "" : "s"} flagged for review</div></div>
+            <div class="kpi-card"><div class="kpi-label">MTTR Improvement</div><div class="kpi-value">${formatPercentage(summary.mttr_improvement_pct ?? metrics.mttr_improvement_pct ?? 0, 0)}</div><div class="kpi-note">${summary.hours_saved ?? metrics.hours_saved ?? 0} hours saved with ${formatPercentage(summary.adoption_rate_pct ?? metrics.adoption_rate_pct ?? 0, 0)} adoption</div></div>
+          </div>
+          <section class="table-card">
+            <div class="search-row"><strong>Agent Performance Matrix</strong><span class="page-subtitle">Snapshot refreshed ${formatDateTime(summary.refreshed_at) || nowTime()}</span></div>
+            <table class="simple-table performance-table">
+              <thead><tr><th>Agent Name</th><th>Status</th><th>Executions</th><th>Review Backlog</th><th>Review Pass Rate</th><th>Avg Confidence</th><th>Avg Response</th><th>Approval Turnaround</th><th>Last Active</th></tr></thead>
+              <tbody>${rows || '<tr><td colspan="9">No agent outputs have been generated yet.</td></tr>'}</tbody>
+            </table>
+          </section>
+        </div>
+      `;
+      persistActiveSessionSnapshot();
+    }
+
+    function openIncidentCard(incidentId) {
+      submitChatMessage(`Check status of ${incidentId}`);
+    }
+
+    function renderConversation() {
+      if (!state.conversation.length) {
+        renderHome();
+        return;
+      }
+
+      const root = document.getElementById("conversationRoot");
+      root.innerHTML = state.conversation.map(message => {
+        if (message.kind === "loading") {
+          return `
+            <div class="message assistant">
+              <div class="message-stack">
+                <div class="message-head"><span class="avatar agent"></span><span class="agent-name">${escapeHtml(getAssistantName())} Workflow</span></div>
+                <div class="bubble">
+                  <div class="bubble-meta">${escapeHtml(getAssistantName())} • ${escapeHtml(message.time)}</div>
+                  <div class="loading-line"><span class="spinner"></span>${escapeHtml(message.text)}</div>
+                  <button class="cancel" onclick="removeLoading()">Cancel request</button>
+                </div>
+              </div>
+            </div>
+          `;
+        }
+        if (message.kind === "report") {
+          return `
+            <div class="message assistant">
+              <div class="message-stack">
+                <div class="message-head"><span class="avatar agent"></span><span class="agent-name">Problem Agent</span></div>
+                <div class="bubble artifact">
+                  <div class="artifact-header">
+                    <h2 class="artifact-title">${escapeHtml(message.report.title)}</h2>
+                    <div class="artifact-subtitle">Draft confidence ${Math.round(message.report.confidence * 100)}% • Human approval required</div>
+                  </div>
+                  <section class="artifact-section">
+                    <h3>Executive Summary</h3>
+                    <p>${escapeHtml(message.report.executive_summary)}</p>
+                  </section>
+                  <section class="artifact-section">
+                    <h3>Root Cause Analysis</h3>
+                    <p>${escapeHtml(message.report.root_cause_analysis)}</p>
+                  </section>
+                  <section class="artifact-section">
+                    <h3>Corrective Action Plan</h3>
+                    <ul>${message.report.corrective_action_plan.map(item => `<li>${escapeHtml(item)}</li>`).join("")}</ul>
+                  </section>
+                  <section class="artifact-section">
+                    <h3>Supporting Evidence</h3>
+                    <ul>${message.report.evidence.map(item => `<li>${escapeHtml(item)}</li>`).join("")}</ul>
+                  </section>
+                  <section class="artifact-section">
+                    <h3>Governance</h3>
+                    <p>Approval required: Yes. Proposed approver queue item: ${escapeHtml(message.report.governance.proposed_approval_id || "Pending assignment")}.</p>
+                  </section>
+                </div>
+                ${renderResponseRating(message)}
+              </div>
+            </div>
+          `;
+        }
+        if (message.kind === "knowledge") {
+          return `
+            <div class="message assistant">
+              <div class="message-stack">
+                <div class="message-head"><span class="avatar agent"></span><span class="agent-name">Knowledge Agent</span></div>
+                <div class="bubble">
+                  <div class="knowledge-article">
+                    ${message.html}
+                  </div>
+                </div>
+                ${renderResponseRating(message)}
+              </div>
+            </div>
+          `;
+        }
+        if (message.kind === "cards") {
+          return `
+            <div class="message assistant">
+              <div class="message-stack">
+                <div class="message-head"><span class="avatar agent"></span><span class="agent-name">${escapeHtml(getAssistantName())}</span></div>
+                <div class="bubble">
+                  <div class="bubble-meta">${escapeHtml(getAssistantName())} • ${escapeHtml(message.time)}</div>
+                  ${message.cardsHtml}
+                </div>
+                ${renderResponseRating(message)}
+              </div>
+            </div>
+          `;
+        }
+        return `
+          <div class="message ${message.role}">
+            <div class="message-stack">
+              ${message.role === "user"
+                ? `<div class="message-head"><span>${escapeHtml(message.time)}</span><span class="avatar user">${escapeHtml(getUserAvatarInitials())}</span></div>`
+                : `<div class="message-head"><span class="avatar agent"></span><span class="agent-name">${escapeHtml(getAssistantName())}</span></div>`}
+              <div class="bubble">
+                ${message.role === "assistant" ? `<div class="bubble-meta">${escapeHtml(getAssistantName())} • ${escapeHtml(message.time)}</div>` : ""}
+                <div>${escapeHtml(message.text)}</div>
+              </div>
+              ${message.role === "assistant" ? renderResponseRating(message) : ""}
+            </div>
+          </div>
+        `;
+      }).join("");
+      syncExperienceUi();
+      persistActiveSessionSnapshot();
+    }
+
+    function addUserMessage(text) {
+      state.conversation.push(createMessage("user", { text, time: nowTime() }));
+      renderConversation();
+    }
+
+    function addAssistantCards(title, cardsHtml) {
+      state.conversation.push(createMessage("assistant", { kind: "cards", title, cardsHtml, time: nowTime() }));
+      renderConversation();
+    }
+
+    function addLoading(text) {
+      removeLoading();
+      state.conversation.push(createMessage("assistant", { kind: "loading", text, time: nowTime() }));
+      renderConversation();
+    }
+
+    function removeLoading() {
+      state.conversation = state.conversation.filter(item => item.kind !== "loading");
+      renderConversation();
+    }
+
+    function clearConversation() {
+      startNewSession();
+    }
+
+    function incidentCards(items) {
+      return items.map(item => `
+        <article class="list-card">
+          <div class="list-title">
+            <span>${escapeHtml(item.id)} • ${escapeHtml(item.title)}</span>
+            <span>Sev ${escapeHtml(item.severity)} • ${escapeHtml(item.status)}</span>
+          </div>
+          <div class="list-subtitle">${escapeHtml(item.summary)}</div>
+          <div class="pill-row">
+            <span class="pill">${escapeHtml(item.domain)}</span>
+            <span class="pill">${escapeHtml(item.service)}</span>
+          </div>
+        </article>
+      `).join("");
+    }
+
+    function problemCards(items) {
+      return items.map(item => `
+        <article class="list-card">
+          <div class="list-title">
+            <span>${escapeHtml(item.id)} • ${escapeHtml(item.title)}</span>
+            <span>${escapeHtml(item.status)}</span>
+          </div>
+          <div class="list-subtitle">${escapeHtml(item.summary)}</div>
+          <div class="pill-row">
+            <span class="pill">${escapeHtml(item.domain)}</span>
+            <span class="pill">${escapeHtml(item.service)}</span>
+            <button class="small-button" onclick="generateRcaReport('${escapeHtml(item.id)}')">Generate RCA/CAP</button>
+          </div>
+        </article>
+      `).join("");
+    }
+
+    function changeCards(items) {
+      return items.length ? items.map(item => `
+        <article class="list-card">
+          <div class="list-title">
+            <span>${escapeHtml(item.id)} • ${escapeHtml(item.title)}</span>
+            <span>${escapeHtml(item.status)}</span>
+          </div>
+          <div class="list-subtitle">${escapeHtml(item.rationale)}</div>
+          <ul>${item.implementation_plan.map(step => `<li>${escapeHtml(step)}</li>`).join("")}</ul>
+        </article>
+      `).join("") : `<article class="list-card"><div class="list-title"><span>No governed change drafts yet</span></div><div class="list-subtitle">Run RCA work from a problem record to create one.</div></article>`;
+    }
+
+    function knowledgeCards(items) {
+      return items.map(item => `
+        <article class="list-card">
+          <div class="list-title">
+            <span>${escapeHtml(item.title)}</span>
+            <span>${escapeHtml(item.source)}</span>
+          </div>
+          <div class="list-subtitle">${escapeHtml(item.summary)}</div>
+          <div class="pill-row">
+            ${(item.tags || []).map(tag => `<span class="pill">${escapeHtml(tag)}</span>`).join("")}
+          </div>
+        </article>
+      `).join("");
+    }
+
+    function buildIncidentCard(response) {
+      const incident = response.incident;
+      const articlePills = (response.articles || []).slice(0, 3).map(article => `<span class="pill">${escapeHtml(article.title)}</span>`).join("");
+      return `
+        <div class="artifact">
+          <div class="artifact-header">
+            <h2 class="artifact-title">Incident ${escapeHtml(incident.id)}</h2>
+            <div class="artifact-subtitle">${escapeHtml(response.message)}</div>
+          </div>
+          <section class="artifact-section">
+            <table class="simple-table">
+              <tbody>
+                <tr><td>Status</td><td>${escapeHtml(incident.status)}</td></tr>
+                <tr><td>Priority</td><td>${escapeHtml(priorityLabel(incident.severity))}</td></tr>
+                <tr><td>Owner</td><td>${escapeHtml(incident.assignee)}</td></tr>
+                <tr><td>Created</td><td>${formatDate(incident.opened_at)}</td></tr>
+                <tr><td>Service</td><td>${escapeHtml(incident.service)}</td></tr>
+              </tbody>
+            </table>
+            <div class="list-card" style="margin-top:16px">
+              <div class="list-title"><span>Description</span></div>
+              <div>${escapeHtml(incident.summary)}</div>
+            </div>
+            <div class="pill-row" style="margin-top:16px">
+              <button class="small-button" onclick="showKnowledge('Troubleshoot ${escapeHtml(incident.id)}')">Troubleshoot in KB</button>
+              <button class="small-button secondary" onclick="createKnowledgeDraft('${escapeHtml(incident.id)}')">Create KB Draft</button>
+            </div>
+          </section>
+          ${articlePills ? `<section class="artifact-section"><div class="pill-row">${articlePills}</div></section>` : ""}
+        </div>
+      `;
+    }
+
+    function buildIncidentResolutionCard(response) {
+      const incident = response.incident;
+      const resolution = response.resolution || {};
+      const relatedArticles = (response.articles || []).map(article => `
+        <article class="list-card">
+          <div class="list-title">
+            <span>${escapeHtml(article.title)}</span>
+            <span>${escapeHtml(article.source)}</span>
+          </div>
+          <div class="list-subtitle">${escapeHtml(article.summary)}</div>
+        </article>
+      `).join("");
+      return `
+        <div class="artifact">
+          <div class="artifact-header">
+            <h2 class="artifact-title">Resolution Recommendation ${escapeHtml(incident.id)}</h2>
+            <div class="artifact-subtitle">${escapeHtml(response.message)}</div>
+          </div>
+          <section class="artifact-section">
+            <table class="simple-table">
+              <tbody>
+                <tr><td>Status</td><td>${escapeHtml(incident.status)}</td></tr>
+                <tr><td>Priority</td><td>${escapeHtml(priorityLabel(incident.severity))}</td></tr>
+                <tr><td>Owner</td><td>${escapeHtml(incident.assignee)}</td></tr>
+                <tr><td>Service</td><td>${escapeHtml(incident.service)}</td></tr>
+                <tr><td>Confidence</td><td>${Math.round((resolution.confidence || 0) * 100)}%</td></tr>
+              </tbody>
+            </table>
+          </section>
+          <section class="artifact-section">
+            <h3>Likely Cause</h3>
+            <p>${escapeHtml(resolution.likely_cause || "No likely cause available.")}</p>
+          </section>
+          <section class="artifact-section">
+            <h3>Recommended Next Steps</h3>
+            <ul>${(resolution.recommendations || []).map(item => `<li>${escapeHtml(item)}</li>`).join("") || "<li>No recommendations available.</li>"}</ul>
+          </section>
+          <section class="artifact-section">
+            <h3>Supporting Evidence</h3>
+            <ul>${(resolution.evidence || []).map(item => `<li>${escapeHtml(item)}</li>`).join("") || "<li>No evidence available.</li>"}</ul>
+          </section>
+          <section class="artifact-section">
+            <h3>Related Knowledge and Tickets</h3>
+            ${relatedArticles || "<p>No related KB or prior incident evidence was found for this incident.</p>"}
+          </section>
+        </div>
+      `;
+    }
+
+    function buildKnowledgeHtml(response) {
+      const incidentId = response.incident?.id;
+      const draftAction = incidentId
+        ? `<div class="pill-row" style="margin-bottom:16px"><button class="small-button" onclick="createKnowledgeDraft('${escapeHtml(incidentId)}')">Create KB Draft in ServiceNow</button></div>`
+        : "";
+      return `
+        ${draftAction}
+        ${response.article_html || `
+          <div class="bubble-meta">${escapeHtml(getAssistantName())} • ${escapeHtml(nowTime())}</div>
+          <p>${escapeHtml(response.message)}</p>
+          <h3>Retrieved Knowledge</h3>
+          ${knowledgeCards(response.articles || []) || "<p>No validated knowledge articles were found for this query.</p>"}
+        `}
+        <h3>Related Knowledge Sources</h3>
+        ${knowledgeCards(response.articles || []) || "<p>No published knowledge matches were returned.</p>"}
+      `;
+    }
+
+    function buildKnowledgeDraftCard(response) {
+      const article = response.servicenow_article;
+      const localDraft = response.local_draft || {};
+      const approvalId = response.approval?.id;
+      const approvalStatus = response.approval?.status || "pending";
+      const serviceNowAction = article.url
+        ? `<a class="small-button" href="${escapeHtml(article.url)}" target="_blank" rel="noreferrer">Open in ServiceNow</a>`
+        : `<span class="pill">ServiceNow sync pending</span>`;
+      const approvalActions = approvalId && approvalStatus === "pending"
+        ? `
+          <button class="small-button" onclick="decideApproval('${escapeHtml(approvalId)}', 'approved')">Approve and Save to ServiceNow</button>
+          <button class="small-button secondary" onclick="decideApproval('${escapeHtml(approvalId)}', 'rejected')">Reject Draft</button>
+        `
+        : `<span class="pill">Approval ${escapeHtml(approvalStatus)}</span>`;
+      return `
+        <div class="artifact">
+          <div class="artifact-header">
+            <h2 class="artifact-title">${escapeHtml(response.article_title)}</h2>
+            <div class="artifact-subtitle">Local knowledge draft • Human validation required before ServiceNow save</div>
+          </div>
+          <section class="artifact-section">
+            <p>${escapeHtml(response.message)}</p>
+          </section>
+          <section class="artifact-section">
+            <table class="simple-table">
+              <tbody>
+                <tr><td>Local Folder</td><td>${escapeHtml(localDraft.path || "Not staged")}</td></tr>
+                <tr><td>Article Number</td><td>${escapeHtml(article.number)}</td></tr>
+                <tr><td>State</td><td>${escapeHtml(article.workflow_state)}</td></tr>
+                <tr><td>Approval Queue</td><td>${escapeHtml(response.approval.id || "Pending assignment")}</td></tr>
+                <tr><td>Local Draft Status</td><td>${escapeHtml(localDraft.status || "Pending approval")}</td></tr>
+              </tbody>
+            </table>
+            <div class="pill-row" style="margin-top:16px">
+              ${approvalActions}
+              ${serviceNowAction}
+            </div>
+          </section>
+          <section class="artifact-section">
+            <div class="knowledge-article">
+              ${response.article_html}
+            </div>
+          </section>
+        </div>
+      `;
+    }
+
+    function addChatResponse(response) {
+      if (response.kind === "incident") {
+        addAssistantCards(response.incident.id, buildIncidentCard(response));
+        return;
+      }
+      if (response.kind === "incident_resolution") {
+        addAssistantCards(`Resolution ${response.incident.id}`, buildIncidentResolutionCard(response));
+        return;
+      }
+      if (response.kind === "knowledge") {
+        state.conversation.push(createMessage("assistant", { kind: "knowledge", html: buildKnowledgeHtml(response), time: nowTime() }));
+        renderConversation();
+        return;
+      }
+      if (response.kind === "knowledge_draft") {
+        addAssistantCards(response.servicenow_article.number, buildKnowledgeDraftCard(response));
+        return;
+      }
+      if (response.kind === "knowledge_draft_staged") {
+        addAssistantCards("Local KB Draft", buildKnowledgeDraftCard(response));
+        return;
+      }
+      if (response.kind === "knowledge_draft_pending_sync") {
+        addAssistantCards(response.servicenow_article.number, buildKnowledgeDraftCard(response));
+        return;
+      }
+      if (response.kind === "incidents") {
+        addAssistantCards("Incident Results", `<div class="list-card"><div class="list-subtitle">${escapeHtml(response.message)}</div></div>${incidentCards(response.incidents || [])}`);
+        return;
+      }
+      if (response.kind === "problems") {
+        addAssistantCards("Problem Results", `<div class="list-card"><div class="list-subtitle">${escapeHtml(response.message)}</div></div>${problemCards(response.problems || [])}`);
+        return;
+      }
+      if (response.kind === "changes") {
+        addAssistantCards("Change Results", `<div class="list-card"><div class="list-subtitle">${escapeHtml(response.message)}</div></div>${changeCards(response.changes || [])}`);
+        return;
+      }
+      if (response.kind === "report") {
+        state.conversation.push(createMessage("assistant", { kind: "report", report: response.report, time: nowTime() }));
+        renderConversation();
+        return;
+      }
+      state.conversation.push(createMessage("assistant", { text: response.message, time: nowTime() }));
+      renderConversation();
+    }
+
+    // Build history: last 10 entries (5 turns), skip loading bubbles, map to {role, content}
+    function buildChatHistory() {
+      return state.conversation
+        .filter(m => m.role !== "loading" && m.kind !== "loading" && m.text)
+        .slice(-10)
+        .map(m => ({ role: m.role === "user" ? "user" : "assistant", content: m.text || "" }));
+    }
+
+    async function submitChatMessage(message, options = {}) {
+      const text = String(message || "").trim();
+      if (!text) {
+        return;
+      }
+
+      setActiveNav("home");
+      state.currentView = "conversation";
+      addUserMessage(text);
+      addLoading(`Consulting ServiceNow and ${getAssistantName()} agents...`);
+
+      try {
+        const response = await api("/api/chat", {
+          method: "POST",
+          body: JSON.stringify({ message: text, role: state.currentRole, history: buildChatHistory() })
+        });
+        removeLoading();
+        addChatResponse(response);
+        await refreshDashboard();
+        if (options.sessionId) {
+          upsertSession({ id: options.sessionId, title: options.title || text, meta: options.meta || "1 msg", kind: options.kind || "default" });
+        }
+      } catch (error) {
+        removeLoading();
+        state.conversation.push(createMessage("assistant", { text: `${getAssistantName()} could not complete the request: ${error.message}`, time: nowTime() }));
+        renderConversation();
+      }
+    }
+
+    async function createKnowledgeDraft(incidentId) {
+      if (!incidentId) {
+        return;
+      }
+      setActiveNav("home");
+      state.currentView = "conversation";
+      addUserMessage(`Create KB draft for ${incidentId}`);
+      addLoading("Staging local knowledge draft for approval...");
+      try {
+        const response = await api(`/api/supervisor/incidents/${incidentId}/knowledge-draft`, {
+          method: "POST"
+        });
+        removeLoading();
+        addChatResponse(response);
+        await refreshDashboard();
+        upsertSession({ id: `kb-${incidentId}`, title: "Knowledge draft", meta: response.local_draft?.status || response.servicenow_article.number, kind: "default" });
+      } catch (error) {
+        removeLoading();
+        state.conversation.push(createMessage("assistant", { text: `Knowledge draft creation failed: ${error.message}`, time: nowTime() }));
+        renderConversation();
+      }
+    }
+
+    async function decideApproval(approvalId, decision) {
+      if (!approvalId) {
+        return;
+      }
+      addLoading(decision === "approved" ? "Approving draft and saving to ServiceNow..." : "Rejecting draft...");
+      try {
+        const response = await api(`/api/approvals/${approvalId}/decision`, {
+          method: "POST",
+          body: JSON.stringify({
+            decision,
+            decided_by: "command_center",
+            notes: decision === "approved"
+        ? `Approved from the ${getCommandCenterTitle()}.`
+        : `Rejected from the ${getCommandCenterTitle()}.`
+          })
+        });
+        removeLoading();
+        const sync = response.knowledge_sync;
+        if (sync) {
+          const action = sync.servicenow_article?.url
+            ? `<a class="small-button" href="${escapeHtml(sync.servicenow_article.url)}" target="_blank" rel="noreferrer">Open in ServiceNow</a>`
+            : "";
+          addAssistantCards("Approval Update", `
+            <div class="artifact">
+              <div class="artifact-header">
+                <h2 class="artifact-title">${escapeHtml(sync.status.replaceAll("_", " "))}</h2>
+                <div class="artifact-subtitle">Approval ${escapeHtml(response.approval.status)}</div>
+              </div>
+              <section class="artifact-section">
+                <p>${escapeHtml(sync.message)}</p>
+                <table class="simple-table">
+                  <tbody>
+                    <tr><td>Approval Queue</td><td>${escapeHtml(response.approval.id)}</td></tr>
+                    <tr><td>Local Folder</td><td>${escapeHtml(sync.local_draft?.path || "Unavailable")}</td></tr>
+                    <tr><td>Local Draft Status</td><td>${escapeHtml(sync.local_draft?.status || "Unknown")}</td></tr>
+                    <tr><td>ServiceNow Article</td><td>${escapeHtml(sync.servicenow_article?.number || "Not created")}</td></tr>
+                  </tbody>
+                </table>
+                <div class="pill-row" style="margin-top:16px">${action}</div>
+              </section>
+            </div>
+          `);
+        } else {
+          addAssistantCards("Approval Update", `<div class="bubble">Approval ${escapeHtml(response.approval.status)} recorded.</div>`);
+        }
+        await refreshDashboard();
+      } catch (error) {
+        removeLoading();
+        state.conversation.push(createMessage("assistant", { text: `Approval update failed: ${error.message}`, time: nowTime() }));
+        renderConversation();
+      }
+    }
+
+    async function refreshDashboard(force = false) {
+      // The UI is driven from a single snapshot to keep the three panes visually in sync.
+      state.dashboard = await api(`/api/dashboard${force ? "?refresh=true" : ""}`);
+      if (state.currentView === "incidents") {
+        await refreshIncidentsData();
+      }
+      renderHealthStatus();
+      renderFeed();
+      renderMetricStrip();
+      renderCurrentView();
+    }
+
+    function renderFeed() {
+      const dashboard = state.dashboard || { approvals: [], outputs: [], audit_log: [] };
+      const items = [];
+
+      (dashboard.audit_log || []).slice(0, 8).forEach(entry => {
+        const payload = entry.payload || {};
+        const kindMap = {
+          incident_viewed: {
+            kind: "incident",
+            label: "Incident Agent",
+            text: `Viewed incident ${payload.incident_id || ""}${payload.title ? `: ${payload.title}` : ""}`
+          },
+            knowledge_guidance_generated: {
+              kind: "orchestration",
+              label: "Knowledge Agent",
+              text: `Prepared troubleshooting guidance for ${payload.incident_id || "the selected incident"}`
+            },
+          incident_resolution_generated: {
+            kind: "incident",
+            label: "Incident Agent",
+            text: `Generated resolution recommendation for ${payload.incident_id || "the selected incident"}`
+          },
+          approval_created: {
+            kind: "monitoring",
+            label: "Governance Agent",
+            text: `Approval queued for ${payload.target_id || payload.output_id || "a pending action"}`
+          },
+          approval_decided: {
+            kind: "monitoring",
+            label: "Governance Agent",
+            text: `Approval ${payload.decision || "updated"} for ${payload.output_id || "a queued item"}`
+          },
+          change_draft_created: {
+            kind: "problem",
+            label: "Change Agent",
+            text: `Drafted governed change ${payload.change_id || ""} for ${payload.service || "the selected service"}`
+          },
+          runtime_settings_updated: {
+            kind: "monitoring",
+            label: "Monitoring Agent",
+            text: "Platform settings were updated"
+          }
+        };
+        const mapped = kindMap[entry.kind];
+        if (!mapped) {
+          return;
+        }
+        items.push({
+          kind: mapped.kind,
+          label: mapped.label,
+          time: new Date(entry.timestamp).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+          text: mapped.text
+        });
+      });
+
+      (dashboard.approvals || []).slice(0, 2).forEach(item => {
+        items.push({
+          kind: "incident",
+          label: "Incident Agent",
+          time: new Date(item.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+          text: `${item.title}. ${item.proposed_action}`
+        });
+      });
+
+      (dashboard.outputs || []).slice(0, 6).forEach(item => {
+        const kind = item.agent_id.includes("governance") ? "monitoring" : item.agent_id.includes("problem") ? "problem" : "orchestration";
+        items.push({
+          kind,
+          label: item.agent_id.replaceAll("_", " "),
+          time: new Date(item.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+          text: item.title
+        });
+      });
+
+      if (!items.length) {
+        items.push({
+          kind: "monitoring",
+          label: "Monitoring Agent",
+          time: nowTime(),
+          text: "CPU threshold healthy. Approval queue is clear."
+        });
+      }
+
+      const uniqueItems = items
+        .filter((item, index, array) => array.findIndex(candidate =>
+          candidate.kind === item.kind && candidate.label === item.label && candidate.time === item.time && candidate.text === item.text
+        ) === index)
+        .slice(0, 8);
+
+      document.getElementById("feedRoot").innerHTML = uniqueItems.map(item => `
+        <article class="feed-card ${item.kind}">
+          <div class="feed-meta">
+            <span>${escapeHtml(item.label)}</span>
+            <span>${escapeHtml(item.time)}</span>
+          </div>
+          <div class="feed-text">${escapeHtml(item.text)}<span class="feed-arrow">›</span></div>
+        </article>
+      `).join("");
+    }
+
+    function renderMetricStrip() {
+      const metrics = (state.dashboard || {}).metrics || {};
+      document.getElementById("metricStrip").innerHTML = `
+        <div class="metric-tile"><span>Open Incidents</span><strong>${metrics.open_incidents ?? 0}</strong></div>
+        <div class="metric-tile"><span>Pending Approvals</span><strong>${metrics.pending_approvals ?? 0}</strong></div>
+        <div class="metric-tile"><span>MTTR Improvement</span><strong>${metrics.mttr_improvement_pct ?? 0}%</strong></div>
+      `;
+    }
+
+    function summarizeHealthState() {
+      const dashboard = state.dashboard || {};
+      const metrics = dashboard.metrics || {};
+      const servicenowLive = metrics.servicenow_live || {};
+      const auditLog = dashboard.audit_log || [];
+      if (servicenowLive.connected === false) {
+        return {
+          level: "failure",
+          label: "System Failure",
+          title: "Connector or Platform Failures",
+          details: [
+            servicenowLive.reason || "ServiceNow is disconnected. Showing local fallback data only."
+          ]
+        };
+      }
+      const connectorIssues = auditLog
+        .filter(entry => entry.kind === "connector_fallback")
+        .slice(0, 5)
+        .map(entry => {
+          const payload = entry.payload || {};
+          const connector = payload.connector || "connector";
+          const reason = payload.reason || "Unknown connector issue.";
+          return `${connector}: ${reason}`;
+        });
+      if (connectorIssues.length) {
+        return {
+          level: "failure",
+          label: "System Failure",
+          title: "Connector or Platform Failures",
+          details: connectorIssues
+        };
+      }
+
+      const warnings = [];
+      if ((metrics.pending_approvals ?? 0) > 0) {
+        warnings.push(`${metrics.pending_approvals} approval task(s) are still awaiting human action.`);
+      }
+      (metrics.governance_alerts || []).slice(0, 4).forEach(item => {
+        warnings.push(item);
+      });
+      if (warnings.length) {
+        return {
+          level: "warning",
+          label: "System Warning",
+          title: "Operational Warnings",
+          details: warnings
+        };
+      }
+
+      return {
+        level: "healthy",
+        label: "System Healthy",
+        title: "System Healthy",
+        details: [
+          "No connector failures were detected in the latest audit events.",
+          "No active operational warnings require escalation right now."
+        ]
+      };
+    }
+
+    function renderHealthStatus() {
+      const health = summarizeHealthState();
+      const root = document.getElementById("platformHealth");
+      const label = document.getElementById("platformHealthLabel");
+      const tooltip = document.getElementById("platformHealthTooltip");
+      const tooltipTitle = document.getElementById("platformHealthTooltipTitle");
+      const tooltipList = document.getElementById("platformHealthTooltipList");
+      if (!root || !label || !tooltip || !tooltipTitle || !tooltipList) {
+        return;
+      }
+
+      root.classList.remove("healthy", "warning", "failure");
+      root.classList.add(health.level);
+      label.textContent = health.label;
+      tooltip.hidden = false;
+      tooltipTitle.textContent = health.title;
+      tooltipList.innerHTML = health.details.map(item => `<li>${escapeHtml(item)}</li>`).join("");
+    }
+
+    function showHome() {
+      setActiveNav("home");
+      state.currentView = "home";
+      state.conversation = [];
+      renderCurrentView();
+    }
+
+    async function showIncidents(options = {}) {
+      setActiveNav("incidents");
+      state.currentView = "incidents";
+      state.conversation = [];
+      state.incidentFilters.search = "";
+      state.incidentFilters.status = "all";
+      state.incidentFilters.priority = "all";
+      state.incidentFilters.timeWindow = options.timeWindow || "all";
+      state.incidentFilters.page = 1;
+      state.incidentFilters.pageSize = incidentPageSize();
+      await refreshIncidentsData();
+      renderCurrentView();
+      const filteredCount = filteredIncidents().length;
+      const sessionTitle = state.incidentFilters.timeWindow === "this_week" ? "Weekly incidents" : "Incidents";
+      const sessionMeta = state.incidentFilters.timeWindow === "this_week" ? `${filteredCount} this week` : `${filteredCount} items`;
+      upsertSession({ id: "incidents", title: sessionTitle, meta: sessionMeta, kind: "default" });
+    }
+
+    function showProblems(options = {}) {
+      setActiveNav("problems");
+      state.currentView = "problems";
+      state.conversation = [];
+      state.problemFilters.dueWindow = options.dueWindow || "all";
+      renderCurrentView();
+      const filteredCount = filteredProblems().length;
+      const sessionTitle = state.problemFilters.dueWindow === "this_week" ? "Weekly problems" : "Problem review";
+      const sessionMeta = state.problemFilters.dueWindow === "this_week" ? `${filteredCount} due this week` : `${filteredCount} records`;
+      upsertSession({ id: "problems", title: sessionTitle, meta: sessionMeta, kind: "default" });
+    }
+
+    function showChanges() {
+      setActiveNav("changes");
+      state.currentView = "changes";
+      state.conversation = [];
+      renderCurrentView();
+      upsertSession({ id: "changes", title: "Change drafts", meta: `${state.dashboard?.changes?.length || 0} drafts`, kind: "default" });
+    }
+
+    async function showKnowledge(query = "Troubleshoot the top active incident") {
+      await submitChatMessage(query, {
+        sessionId: "knowledge",
+        title: query,
+        meta: "Knowledge guidance"
+      });
+    }
+
+    function showObservability() {
+      setActiveNav("observability");
+      state.currentView = "observability";
+      state.conversation = [];
+      renderCurrentView();
+      upsertSession({ id: "observability", title: "Observability", meta: "Global health", kind: "default" });
+    }
+
+    async function showAgentPerformance() {
+      setActiveNav("performance");
+      state.currentView = "performance";
+      state.conversation = [];
+      await refreshDashboard(true);
+      upsertSession({ id: "metrics", title: "Agent performance", meta: "Governance view", kind: "default" });
+    }
+
+    async function generateRcaReport(problemId) {
+      setActiveNav("problems");
+      state.currentView = "conversation";
+      const targetProblemId = problemId || state.dashboard?.problems?.[0]?.id;
+      if (!targetProblemId) {
+        alert("No problem record is available for RCA generation.");
+        return;
+      }
+
+      addUserMessage(`Generate RCA/CAP report for ${targetProblemId}`);
+      addLoading(`Generating RCA/CAP using the ${getAssistantName()} workflow...`);
+
+      try {
+        const report = await api(`/api/supervisor/problems/${targetProblemId}/rca-report`, { method: "POST" });
+        removeLoading();
+        state.conversation.push(createMessage("assistant", { kind: "report", report, time: nowTime() }));
+        renderCurrentView();
+        await refreshDashboard();
+        upsertSession({ id: `report-${targetProblemId}`, title: "Generate an RCA/CAP", meta: targetProblemId, kind: "report" });
+      } catch (error) {
+        removeLoading();
+        state.conversation.push(createMessage("assistant", { text: `RCA/CAP generation failed: ${error.message}`, time: nowTime() }));
+        renderCurrentView();
+      }
+    }
+
+    function handleComposer() {
+      const input = document.getElementById("composerInput");
+      const value = input.value.trim();
+      if (!value) {
+        return;
+      }
+      input.value = "";
+      submitChatMessage(value, {
+        sessionId: `chat-${Date.now()}`,
+        title: value.length > 28 ? `${value.slice(0, 28)}...` : value,
+        meta: "1 msg"
+      });
+    }
+
+    function clearComposerInput() {
+      const input = document.getElementById("composerInput");
+      if (!input) {
+        return;
+      }
+      input.value = "";
+      input.focus();
+    }
+
+    async function refreshCurrentViewData() {
+      if (state.currentView === "incidents") {
+        await refreshIncidentsData();
+        renderIncidentsPage();
+        return;
+      }
+      await refreshDashboard(state.currentView === "performance");
+    }
+
+    document.getElementById("composerInput").addEventListener("keydown", event => {
+      if (event.key === "Enter") {
+        handleComposer();
+      }
+    });
+
+    document.addEventListener("click", event => {
+      const insideFooter = event.target.closest(".sidebar-footer");
+      const insideSettings = event.target.closest(".settings-panel");
+      const insideProfile = event.target.closest(".profile-shell");
+      if (!insideFooter) {
+        closeUtilityPanels();
+      }
+      if (!insideProfile) {
+        closeProfileMenu();
+      }
+      if (!insideSettings && event.target.id === "settingsOverlay") {
+        closeSettings();
+      }
+      if (!insideSettings && event.target.id === "profileOverlay") {
+        closeProfilePanel();
+      }
+      if (!insideSettings && event.target.id === "helpOverlay") {
+        closeHelpPanel();
+      }
+    });
+
+    syncRoleUi();
+    syncThemeUi();
+    syncExperienceUi();
+    syncProfileUi();
+    loadRuntimeSettings();
+    renderSessions();
+    renderCurrentView();
+    refreshDashboard().catch(error => {
+      console.error(error);
+      alert(`Dashboard refresh failed: ${error.message}`);
+    });
+  </script>
+</body>
+</html>

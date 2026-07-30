@@ -1,0 +1,127 @@
+
+<style>
+.sb { background: var(--color-background-secondary); border: 0.5px solid var(--color-border-tertiary); border-radius: 10px; padding: 10px 14px; }
+.st { font-size: 11px; font-weight: 500; color: var(--color-text-secondary); letter-spacing: .05em; margin-bottom: 8px; }
+.sbox { border-radius: 8px; padding: 7px 10px; margin-bottom: 6px; font-size: 12px; font-weight: 500; }
+.sk { background: #E6F1FB; color: #0C447C; border: 0.5px solid #85B7EB; }
+.sp { background: #EEEDFE; color: #3C3489; border: 0.5px solid #AFA9EC; }
+.st2 { background: #E1F5EE; color: #085041; border: 0.5px solid #5DCAA5; }
+.sa { background: #FAEEDA; color: #633806; border: 0.5px solid #EF9F27; }
+.sc { background: #FAECE7; color: #712B13; border: 0.5px solid #F0997B; }
+.sn { background: #F1EFE8; color: #444441; border: 0.5px solid #B4B2A9; }
+.pipeline { display: flex; align-items: stretch; gap: 0; border: 1.5px solid #85B7EB; border-radius: 10px; overflow: hidden; background: var(--color-background-primary); margin-bottom: 4px; }
+.pstep { flex: 1; padding: 10px 8px; border-right: 0.5px solid #B5D4F4; text-align: center; }
+.pstep:last-child { border-right: none; }
+.pstep-label { font-size: 10px; font-weight: 500; color: #0C447C; margin-bottom: 4px; }
+.pstep-name { font-size: 12px; font-weight: 500; color: var(--color-text-primary); }
+.parrow { font-size: 14px; color: #85B7EB; display: flex; align-items: center; padding: 0 2px; }
+.badge3 { font-size: 10px; padding: 2px 7px; border-radius: 8px; font-weight: 500; }
+</style>
+<h2 class="sr-only">Architecture 3: Semantic Kernel skill pipeline — capabilities are typed skills executed in sequence by a central kernel with a shared context object.</h2>
+<div style="padding: 1rem 0">
+
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:4px;">
+    <div class="sb">
+      <div class="st">User &amp; system entry</div>
+      <div class="sbox sn">AskPG.com / portal</div>
+      <div class="sbox sn">Webhooks &amp; triggers</div>
+    </div>
+    <div class="sb">
+      <div class="st">Semantic kernel — planner</div>
+      <div class="sbox sk">Sequential planner</div>
+      <div class="sbox sk">Stepwise planner</div>
+      <div class="sbox sk">Function calling router</div>
+    </div>
+  </div>
+
+  <div style="margin:4px 0; font-size:11px; color:var(--color-text-secondary); text-align:center;">skill execution pipeline</div>
+
+  <div class="pipeline">
+    <div class="pstep">
+      <div class="pstep-label">Step 1</div>
+      <div class="pstep-name" style="color:#0C447C;">Intent parser</div>
+      <div style="font-size:10px;color:var(--color-text-secondary);margin-top:3px;">NLU / classify</div>
+    </div>
+    <div class="parrow">›</div>
+    <div class="pstep">
+      <div class="pstep-label">Step 2</div>
+      <div class="pstep-name" style="color:#3C3489;">Knowledge skill</div>
+      <div style="font-size:10px;color:var(--color-text-secondary);margin-top:3px;">RAG retrieval</div>
+    </div>
+    <div class="parrow">›</div>
+    <div class="pstep">
+      <div class="pstep-label">Step 3</div>
+      <div class="pstep-name" style="color:#3C3489;">Action skill</div>
+      <div style="font-size:10px;color:var(--color-text-secondary);margin-top:3px;">ITSM / automate</div>
+    </div>
+    <div class="parrow">›</div>
+    <div class="pstep">
+      <div class="pstep-label">Step 4</div>
+      <div class="pstep-name" style="color:#633806;">Response skill</div>
+      <div style="font-size:10px;color:var(--color-text-secondary);margin-top:3px;">Compose &amp; format</div>
+    </div>
+    <div class="parrow">›</div>
+    <div class="pstep">
+      <div class="pstep-label">Step 5</div>
+      <div class="pstep-name" style="color:#712B13;">Guard skill</div>
+      <div style="font-size:10px;color:var(--color-text-secondary);margin-top:3px;">Policy check</div>
+    </div>
+  </div>
+
+  <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; margin-bottom:4px;">
+    <div class="sb" style="border-color:#85B7EB;">
+      <div class="st">Shared kernel context</div>
+      <div class="sbox sk" style="font-size:11px;">Variables &amp; state bag</div>
+      <div class="sbox sk" style="font-size:11px;">Short-term memory</div>
+      <div class="sbox sk" style="font-size:11px;">Conversation history</div>
+    </div>
+    <div class="sb">
+      <div class="st">Skill plugins</div>
+      <div class="sbox sp" style="font-size:11px;">Native functions</div>
+      <div class="sbox sp" style="font-size:11px;">Semantic functions</div>
+      <div class="sbox sp" style="font-size:11px;">OpenAPI connectors</div>
+    </div>
+    <div class="sb">
+      <div class="st">Memory stores</div>
+      <div class="sbox st2" style="font-size:11px;">Azure Cognitive Search</div>
+      <div class="sbox st2" style="font-size:11px;">Vector store (embeddings)</div>
+      <div class="sbox st2" style="font-size:11px;">Long-term knowledge</div>
+    </div>
+  </div>
+
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:4px;">
+    <div class="sb">
+      <div class="st">AI service connector</div>
+      <div class="sbox sa" style="font-size:11px;">Azure OpenAI (GPT-4o)</div>
+      <div class="sbox sa" style="font-size:11px;">LLM router / model select</div>
+      <div class="sbox sa" style="font-size:11px;">Embedding service</div>
+    </div>
+    <div class="sb">
+      <div class="st">HITL &amp; governance</div>
+      <div class="sbox sc" style="font-size:11px;">Approval interrupt hook</div>
+      <div class="sbox sc" style="font-size:11px;">RBAC / compliance filter</div>
+      <div class="sbox sc" style="font-size:11px;">Audit &amp; telemetry export</div>
+    </div>
+  </div>
+
+  <div class="sb">
+    <div class="st">Enterprise connectors (native Semantic Kernel plugins)</div>
+    <div style="display:grid; grid-template-columns:repeat(5,1fr); gap:6px;">
+      <div class="sbox sn" style="font-size:11px;">ServiceNow</div>
+      <div class="sbox sn" style="font-size:11px;">SAP / ERP</div>
+      <div class="sbox sn" style="font-size:11px;">Azure DevOps</div>
+      <div class="sbox sn" style="font-size:11px;">SharePoint / M365</div>
+      <div class="sbox sn" style="font-size:11px;">Splunk / monitoring</div>
+    </div>
+  </div>
+
+  <div style="margin-top:12px; padding:8px 12px; border-radius:8px; background: var(--color-background-secondary); border: 0.5px solid var(--color-border-tertiary); display:flex; gap:14px; flex-wrap:wrap;">
+    <span style="font-size:11px; color: var(--color-text-secondary);">Legend:</span>
+    <span class="badge3" style="background:#E6F1FB;color:#0C447C;">Kernel / planner</span>
+    <span class="badge3" style="background:#EEEDFE;color:#3C3489;">Skill plugin</span>
+    <span class="badge3" style="background:#E1F5EE;color:#085041;">Memory</span>
+    <span class="badge3" style="background:#FAEEDA;color:#633806;">AI service</span>
+    <span class="badge3" style="background:#FAECE7;color:#712B13;">Governance</span>
+    <span class="badge3" style="background:#F1EFE8;color:#444441;">Infrastructure</span>
+  </div>
+</div>

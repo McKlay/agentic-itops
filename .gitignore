@@ -1,0 +1,56 @@
+# ── Temporary / scratch directories ─────────────────────────────────────────
+.codex_tmp/
+.docx_extract/
+
+# ── Python ───────────────────────────────────────────────────────────────────
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.pdb
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.egg-info/
+dist/
+build/
+.venv/
+venv/
+env/
+.python-version
+
+# ── Environment / secrets (all directories) ──────────────────────────────────
+**/.env
+**/.env.*
+!**/.env.example
+
+# ── Logs ─────────────────────────────────────────────────────────────────────
+*.log
+logs/
+frontend/frontend-console-logs.txt
+backend/uvicorn-logs.txt
+
+# ── Backend build artifacts ──────────────────────────────────────────────────
+backend/.env.local
+
+# ── Frontend build artifacts ──────────────────────────────────────────────────
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+frontend/.env.local
+
+# ── OS artefacts ─────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ── IDE / editor ─────────────────────────────────────────────────────────────
+.vscode/
+.idea/
+*.suo
+*.sw?
+*.code-workspace
+
+# ── Miscellaneous ───────────────────────────────────────────────────────────
+docs/KnowledgeForge2-arch-type.md
+docs/pygentic-arch-type.md

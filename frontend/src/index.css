@@ -1,0 +1,181 @@
+@import "tailwindcss";
+
+/* ── Design Tokens ─────────────────────────────────────── */
+
+:root {
+  /* Surfaces */
+  --page: #f5f6fb;
+  --surface: #ffffff;
+  --surface-soft: #f7f8fc;
+  --surface-tint: #f3eefe;
+  --surface-raised: #ffffff;
+
+  /* Lines */
+  --line: #ececf3;
+  --line-strong: #e4ddf8;
+
+  /* Text */
+  --text: #1f2533;
+  --muted: #70778c;
+
+  /* Brand */
+  --purple: #7d48ff;
+  --purple-hover: #6930e0;
+  --purple-soft: #efe7ff;
+
+  /* Semantic */
+  --green: #18a957;
+  --green-soft: #ebfff2;
+  --red: #ef6a6a;
+  --red-soft: #fff0f0;
+  --yellow: #f3b741;
+  --yellow-soft: #fff8e8;
+
+  /* Accent pastels — deeper, richer tones */
+  --blue-soft: #d6e4ff;
+  --pink-soft: #ffd6d6;
+  --mint-soft: #ccf5e7;
+  --lavender-soft: #e6d6ff;
+
+  /* Shadows — more depth */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 14px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 8px 28px rgba(0, 0, 0, 0.10);
+
+  /* Radius — Fluent UI 4px grid */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-full: 9999px;
+
+  /* Animation */
+  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-base: 200ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ── Dark Theme ──────────────────────────────────────── */
+
+body[data-theme="dark"] {
+  --page: #0d1220;
+  --surface: #161d30;
+  --surface-soft: #20283d;
+  --surface-tint: #231c3c;
+  --surface-raised: #1c2438;
+
+  --line: #2c3450;
+  --line-strong: #433760;
+
+  --text: #edf1ff;
+  --muted: #a4aec8;
+
+  --purple-soft: #2a2148;
+  --green-soft: #133727;
+  --red-soft: #3d2025;
+  --yellow-soft: #392d17;
+  --blue-soft: #1b2f58;
+  --pink-soft: #41242b;
+  --mint-soft: #173a34;
+  --lavender-soft: #2b2346;
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.2);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+/* ── Base Reset ──────────────────────────────────────── */
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: "Segoe UI", "Aptos", system-ui, -apple-system, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--text);
+  background: var(--page);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#root {
+  height: 100%;
+}
+
+/* ── Scrollbar Styling ───────────────────────────────── */
+
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--line);
+  border-radius: var(--radius-full);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--muted);
+}
+
+/* ── Animations ──────────────────────────────────────── */
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Teams-Aware Responsive Scaling ──────────────────── */
+/* Teams desktop applies its own zoom (80%, 100%, 110%, 125%, 150%).
+   The tab iframe width also varies based on sidebar state and
+   whether the tab is in channel, chat, or side-panel mode
+   (as narrow as ~620px in side-panel).
+   We use relative font sizing and fluid column widths to handle this. */
+
+/* When Teams is zoomed in or viewport < 1024px, tighten spacing */
+@media (max-width: 1024px) {
+  body {
+    font-size: 13px;
+  }
+}
+
+/* Side-panel mode: single column */
+@media (max-width: 620px) {
+  body {
+    font-size: 13px;
+  }
+}
+
+/* ── Drawer overlay — disable body scroll when open ─── */
+body.drawer-open {
+  overflow: hidden;
+}
+
+/* Ensure SVG icons scale with text */
+svg[aria-hidden="true"] {
+  flex-shrink: 0;
+}

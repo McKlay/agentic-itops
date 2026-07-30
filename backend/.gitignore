@@ -1,0 +1,25 @@
+# Backend-specific ignores (most patterns inherited from root .gitignore)
+
+# ── Local environment / secrets ─────────────────────────────────────────────
+.env
+.env.local
+.env.*.local
+
+# ── Logs ────────────────────────────────────────────────────────────────────
+uvicorn-logs.txt
+*.log
+
+# ── Python / build artifacts ────────────────────────────────────────────────
+__pycache__/
+*.pyc
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.egg-info/
+dist/
+build/
+
+# ── Virtual environment ─────────────────────────────────────────────────────
+.venv/
+venv/
+env/

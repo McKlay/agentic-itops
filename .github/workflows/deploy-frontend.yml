@@ -1,0 +1,31 @@
+name: Deploy Frontend
+
+on:
+  push:
+    branches: [main]
+    paths: ["frontend/**"]
+  workflow_dispatch:          # allow manual trigger
+
+jobs:
+  build-and-deploy:
+    name: Build and Deploy to Azure Static Web Apps
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      # TODO: Uncomment and configure once Static Web Apps resource is provisioned (Phase 10.3)
+      # - name: Deploy to Azure Static Web Apps
+      #   uses: Azure/static-web-apps-deploy@v1
+      #   with:
+      #     azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
+      #     repo_token: ${{ secrets.GITHUB_TOKEN }}
+      #     action: upload
+      #     app_location: "frontend"      # Vite source root
+      #     output_location: "dist"       # Vite build output
+      #     skip_api_build: true          # API is App Service, not SWA Functions
+
+      - name: Placeholder — frontend deploy not yet configured
+        run: echo "Static Web Apps deployment will be configured in Phase 10.3"
