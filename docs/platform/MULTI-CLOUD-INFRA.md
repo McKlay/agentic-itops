@@ -38,7 +38,7 @@ Each cloud module should expose similar outputs, even if the internal resources 
 
 ---
 
-## 3. Common platform capabilities
+## 3. Common platform capabilities 
 
 Every cloud deployment should provide these logical capabilities:
 
